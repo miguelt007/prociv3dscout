@@ -139,8 +139,7 @@ def index():
         else:
         total_meios_aquaticos = 0.
         total_incendios=int(df_filtrado["natureza"].str.contains("incêndio", case=False).sum())
-)
-
+    )
 # Executar a aplicação
 if __name__ == "__main__":
     app.run(debug=True)
