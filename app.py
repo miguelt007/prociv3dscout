@@ -74,7 +74,7 @@ def index():
         df_filtrado = df_filtrado[df_filtrado["EstadoOcorrencia"] == estado]
 
     # Lista única para preencher o dropdown
-    distritos = sorted(df["Distrito"].unique())
+    distritos = sorted(df["distrito"].unique())
     estados = sorted(df["EstadoOcorrencia"].unique())
 
     # Recriar gráficos com df_filtrado
