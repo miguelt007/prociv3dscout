@@ -52,6 +52,7 @@ def index():
     total_ocorrencias = len(df)
     total_operacionais = df["totaloperacionais"].sum()
     total_meios = df["totalmeios"].sum()
+    total_meios_aereos = pd.to_numeric(df["NumeroMeiosAereosEnvolvidos"], errors="coerce").fillna(0).astype(int).sum()
 
     # 🧾 Dados para tabela
     df_filtrado = df[[
@@ -70,6 +71,7 @@ def index():
         total_ocorrencias=total_ocorrencias,
         total_operacionais=total_operacionais,
         total_meios=total_meios
+        total_meios_aereos=total_meios_aereos
     )
 
 if __name__ == "__main__":
