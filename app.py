@@ -56,31 +56,35 @@ def obter_dados():
     except Exception as e:
         print(f"Erro ao obter dados: {e}")
         return pd.DataFrame()
-
 # Rota principal
 @app.route("/", methods=["GET"])
 def index():
     distrito = request.args.get("distrito")
     estado = request.args.get("estado")
 
+    # 📊 Carregar dados
     df = obter_dados()
     df_filtrado = df.copy()
 
+    # 🔍 Filtrar por distrito e estado
     if distrito:
         df_filtrado = df_filtrado[df_filtrado["distrito"] == distrito]
     if estado:
         df_filtrado = df_filtrado[df_filtrado["estadoocorrencia"] == estado]
 
-    # ✔️ Blindagem da métrica dos meios aquáticos
-    if "NumeroMeiosAquaticosEnvolvidos" in df_filtrado.columns:
-        total_aquaticos = int(df_filtrado["NumeroMeiosAquaticosEnvolvidos"].fillna(0).sum())
-    else:
-        total_aquaticos = 0
+    # 📌 Métricas agregadas com blindagem
+    total_ocorrencias = len(df_filtrado)
+    total_operacionais = int(df_filtrado.get("numeromeiosterrestresenvolvidos", pd.Series([0])).sum())
+    total_veiculos = int(df_filtrado.get("NumeroMeiosTerrestresEnvolvidos", pd.Series([0])).sum())
+    total_aereos = int(df_filtrado.get("numeromeiosaereosenvolvidos", pd.Series([0])).sum())
+    total_meios_aquaticos = int(df_filtrado.get("NumeroMeiosAquaticosEnvolvidos", pd.Series([0])).fillna(0).sum())
+    total_incendios = int(df_filtrado.get("natureza", pd.Series([])).str.contains("incêndio", case=False, na=False).sum())
 
-    distritos = sorted(df["distrito"].unique())
-    estados = sorted(df["estadoocorrencia"].unique())
+    # 📍 Dropdowns
+    distritos = sorted(df["distrito"].dropna().unique())
+    estados = sorted(df["estadoocorrencia"].dropna().unique())
 
-    # Gráfico 1
+    # 📊 Gráfico 1: Meios por ocorrência
     grafico = px.bar(
         df_filtrado,
         x="dataocorrencia",
@@ -90,7 +94,7 @@ def index():
     )
     grafico_html = grafico.to_html(full_html=False)
 
-    # Gráfico 2
+    # 📊 Gráfico 2: Total por distrito
     df_barras = df_filtrado.groupby("distrito", as_index=False)["totalmeios"].sum()
     df_barras = df_barras[df_barras["totalmeios"] > 0]
 
@@ -102,12 +106,10 @@ def index():
         text="totalmeios"
     )
     grafico2.update_traces(textposition="outside")
-
-    valor_max = df_barras["totalmeios"].max()
-    grafico2.update_layout(yaxis=dict(range=[0, valor_max * 1.2]))
+    grafico2.update_layout(yaxis=dict(range=[0, df_barras["totalmeios"].max() * 1.2]))
     grafico2_html = grafico2.to_html(full_html=False)
 
-    # Mapa
+    # 🗺️ Mapa
     mapa = px.scatter_mapbox(
         df_filtrado,
         lat="latitude",
@@ -121,6 +123,7 @@ def index():
     mapa.update_layout(mapbox_style="open-street-map")
     mapa_html = mapa.to_html(full_html=False)
 
+    # 🧾 Renderizar template
     return render_template(
         "index.html",
         mapa=mapa_html,
@@ -130,16 +133,14 @@ def index():
         estados=estados,
         distrito_selecionado=distrito,
         estado_selecionado=estado,
-        total_ocorrencias=len(df_filtrado),
-        total_operacionais=int(df_filtrado["numeromeiosterrestresenvolvidos"].sum()),
-        total_veiculos = int(df_filtrado.get("NumeroMeiosTerrestresEnvolvidos", pd.Series([0])).sum()),
-        total_aereos=int(df_filtrado["numeromeiosaereosenvolvidos"].sum()),
-        if "NumeroMeiosAquaticosEnvolvidos" in df_filtrado.columns:
-        total_meios_aquaticos = int(df_filtrado["NumeroMeiosAquaticosEnvolvidos"].fillna(0).sum())
-        else:
-        total_meios_aquaticos = 0.
-        total_incendios=int(df_filtrado["natureza"].str.contains("incêndio", case=False).sum())
+        total_ocorrencias=total_ocorrencias,
+        total_operacionais=total_operacionais,
+        total_veiculos=total_veiculos,
+        total_aereos=total_aereos,
+        total_meios_aquaticos=total_meios_aquaticos,
+        total_incendios=total_incendios
     )
-# Executar a aplicação
+
+# 🚀 Executar a aplicação
 if __name__ == "__main__":
     app.run(debug=True)
