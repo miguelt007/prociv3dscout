@@ -24,6 +24,7 @@
         .mapa, .grafico-container {
             flex: 1;
             max-width: 48%;
+            min-height: 750px;
             background-color: #fff;
             padding: 15px;
             border-radius: 8px;
