@@ -84,9 +84,9 @@ def index():
 
     # 📌 Métricas agregadas com blindagem
     total_ocorrencias = len(df_filtrado)
-    total_operacionais = int(coluna_segura(df_filtrado, "numeromeiosterrestresenvolvidos").sum())
-    total_veiculos = int(coluna_segura(df_filtrado, "numeroMeiosterrestresenvolvidos").sum())
-    total_aereos = int(coluna_segura(df_filtrado, "numeromeiosaereosenvolvidos").sum())
+    total_operacionais = int(coluna_segura(df_filtrado, "numeromeiosterrestresenvolvidos").fillna(0).sum())
+    total_veiculos = int(coluna_segura(df_filtrado, "numeromeiosterrestresenvolvidos").fillna(0).sum())
+    total_aereos = int(coluna_segura(df_filtrado, "numeromeiosaereosenvolvidos").fillna(0).sum())
     total_meios_aquaticos = int(coluna_segura(df_filtrado, "numeromeiosaquaticosenvolvidos").fillna(0).sum())
     total_incendios = int(
         coluna_segura(df_filtrado, "natureza")
