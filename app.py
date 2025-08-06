@@ -78,10 +78,10 @@ def index():
     estados = sorted(df["estadoocorrencia"].unique())
 
     # Recriar gráficos com df_filtrado
-    grafico = px.bar(df_filtrado, x="dataocorrencia", y="TotalMeios", color="Distrito", title="Meios Envolvidos por Ocorrência")
+    grafico = px.bar(df_filtrado, x="dataocorrencia", y="totalmeios", color="distrito", title="Meios Envolvidos por Ocorrência")
     grafico_html = grafico.to_html(full_html=False)
 
-    grafico2 = px.bar(df_filtrado, x="Distrito", y="TotalMeios", title="Total de Meios por Distrito")
+    grafico2 = px.bar(df_filtrado, x="distrito", y="totalmeios", title="Total de Meios por Distrito")
     grafico2_html = grafico2.to_html(full_html=False)
 
     mapa = px.scatter_mapbox(
@@ -89,7 +89,7 @@ def index():
         lat="Latitude",
         lon="Longitude",
         hover_name="Natureza",
-        hover_data=["EstadoOcorrencia", "Distrito", "Concelho"],
+        hover_data=["estadoocorrencia", "distrito", "concelho"],
         color="Estado",
         zoom=6,
         height=900
