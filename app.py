@@ -17,9 +17,16 @@ def obter_dados():
 
         df = pd.DataFrame(dados_json)
 
-        # ✅ Corrigido: usar o nome correto da coluna
-        df["DataOcorrencia"] = pd.to_datetime(df["DataOcorrencia"])
-        df["valor"] = df["valor"].astype(float)  # ou outro nome, se aplicável
+        # ✅ Correções com os teus nomes de campo
+        df["DataOcorrencia"] = pd.to_datetime(df["DataOcorrencia"], format="%d-%m-%Y %H:%M:%S")
+        df["Latitude"] = df["Latitude"].str.replace(",", ".").astype(float)
+        df["Longitude"] = df["Longitude"].str.replace(",", ".").astype(float)
+
+        # Podes adaptar aqui o campo que vais visualizar no gráfico
+        df["TotalMeios"] = (
+            df["NumeroMeiosTerrestresEnvolvidos"].fillna(0)
+            + df["NumeroMeiosAereosEnvolvidos"].fillna(0)
+        )
 
         return df
 
@@ -36,8 +43,28 @@ def index():
         return "<h2>Não foi possível carregar os dados.</h2>"
 
     # Criar gráfico com Plotly
-    grafico = px.line(df, x="DataOcorrencia", y="valor", title="Evolução dos Valores")
-    grafico_html = grafico.to_html(full_html=False)
+    grafico = px.line(
+    df,
+    x="DataOcorrencia",
+    y="TotalMeios",
+    title="Meios Envolvidos por Ocorrência",
+    color="Distrito"
+)
+grafico_html = grafico.to_html(full_html=False)
+
+# Mapa interativo
+mapa = px.scatter_mapbox(
+    df,
+    lat="Latitude",
+    lon="Longitude",
+    hover_name="Natureza",
+    hover_data=["EstadoOcorrencia", "Distrito", "Concelho"],
+    color="Estado",
+    zoom=6,
+    height=400
+)
+mapa.update_layout(mapbox_style="open-street-map")
+mapa_html = mapa.to_html(full_html=False)
 
     return render_template("index.html", grafico=grafico_html)
 
