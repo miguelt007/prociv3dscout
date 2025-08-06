@@ -51,7 +51,7 @@ def index():
     total_meios = df["totalmeios"].sum()
 
     # 🧾 Dados para tabela
-    df_filtrado = df[["dataocorrencia", "natureza", "distrito", "concelho", "estadoocorrencia", "totalmeios", "totaloperacionais"]].dropna()
+    df_filtrado = df[["dataocorrencia", "natureza", "distrito", "concelho", "estadoocorrencia", "totalmeios", "totaloperacionais"]].fillna("Desconhecido")
     geojson_data = geojson  # já está em formato dict
 
     return render_template(
