@@ -78,7 +78,7 @@ def index():
     estados = sorted(df["estadoocorrencia"].unique())
 
     # Recriar gráficos com df_filtrado
-    grafico = px.bar(df_filtrado, x="DataOcorrencia", y="TotalMeios", color="Distrito", title="Meios Envolvidos por Ocorrência")
+    grafico = px.bar(df_filtrado, x="dataocorrencia", y="TotalMeios", color="Distrito", title="Meios Envolvidos por Ocorrência")
     grafico_html = grafico.to_html(full_html=False)
 
     grafico2 = px.bar(df_filtrado, x="Distrito", y="TotalMeios", title="Total de Meios por Distrito")
