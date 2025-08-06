@@ -3,6 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <title>Dashboard de Ocorrências</title>
+    <script>
+    window.addEventListener('resize', () => {
+        const plots = document.querySelectorAll('.plotly-graph-div');
+        plots.forEach(p => {
+            if (window.Plotly && Plotly.Plots && Plotly.Plots.resize) {
+                Plotly.Plots.resize(p);
+            }
+        });
+    });
+</script>
     <style>
         body {
             font-family: Arial, sans-serif;
