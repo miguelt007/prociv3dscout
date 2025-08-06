@@ -71,6 +71,12 @@ def index():
     if estado:
         df_filtrado = df_filtrado[df_filtrado["estadoocorrencia"] == estado]
 
+    # ✔️ Blindagem da métrica dos meios aquáticos
+    if "NumeroMeiosAquaticosEnvolvidos" in df_filtrado.columns:
+        total_aquaticos = int(df_filtrado["NumeroMeiosAquaticosEnvolvidos"].fillna(0).sum())
+    else:
+        total_aquaticos = 0
+
     distritos = sorted(df["distrito"].unique())
     estados = sorted(df["estadoocorrencia"].unique())
 
@@ -128,7 +134,7 @@ def index():
         total_operacionais=int(df_filtrado["numeromeiosterrestresenvolvidos"].sum()),
         total_veiculos = int(df_filtrado.get("NumeroMeiosTerrestresEnvolvidos", pd.Series([0])).sum()),
         total_aereos=int(df_filtrado["numeromeiosaereosenvolvidos"].sum()),
-        total_aquaticos=int(df_filtrado["numeromeiosaquaticosenvolvidos"].sum()),
+        total_meios_aquaticos=int(df_filtrado["total_aquaticos"].sum()),
         total_incendios=int(df_filtrado["natureza"].str.contains("incêndio", case=False).sum())
 )
 
