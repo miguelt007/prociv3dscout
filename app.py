@@ -21,19 +21,34 @@ def index():
     mapa_html = "<p>Nenhum dado de localização disponível.</p>"
 
     if not df.empty:
-        if 'Tipo' in df.columns:
+        # Gráfico de barras por tipo de ocorrência
+        if 'Tipo' in df.columns and not df['Tipo'].isna().all():
             fig = px.histogram(df, x='Tipo', title='Tipos de Ocorrência')
             grafico_html = fig.to_html(full_html=False)
 
+        # Verificar e preparar coordenadas
         if {'Latitude', 'Longitude'}.issubset(df.columns):
-            df["Latitude"] = df["Latitude"].str.replace(",", ".", regex=False).astype(float)
-            df["Longitude"] = df["Longitude"].str.replace(",", ".", regex=False).astype(float)
-            mapa = px.scatter_mapbox(df,
-                                     lat="Latitude",
-                                     lon="Longitude",
-                                     hover_name="Localidade",
-                                     zoom=6,
-                                     height=500)
+            df["Latitude"] = pd.to_numeric(df["Latitude"].str.replace(",", ".", regex=False), errors="coerce")
+            df["Longitude"] = pd.to_numeric(df["Longitude"].str.replace(",", ".", regex=False), errors="coerce")
+            df.dropna(subset=["Latitude", "Longitude"], inplace=True)
+
+            # Verificar coluna para hover
+            hover_col = "Localidade" if "Localidade" in df.columns else None
+            hover_data = ["Distrito", "Concelho", "Freguesia", "Tipo", "Estado"] if hover_col else None
+            cor = "Tipo" if "Tipo" in df.columns else None
+
+            # Criar mapa
+            mapa = px.scatter_mapbox(
+                df,
+                lat="Latitude",
+                lon="Longitude",
+                hover_name=hover_col,
+                hover_data=hover_data,
+                color=cor,
+                zoom=5,
+                height=500,
+                title=f"{len(df)} ocorrências ativas"
+            )
             mapa.update_layout(mapbox_style="open-street-map")
             mapa_html = mapa.to_html(full_html=False)
 
