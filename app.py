@@ -86,11 +86,11 @@ def index():
 
     mapa = px.scatter_mapbox(
         df_filtrado,
-        lat="Latitude",
-        lon="Longitude",
-        hover_name="Natureza",
+        lat="latitude",
+        lon="longitude",
+        hover_name="natureza",
         hover_data=["estadoocorrencia", "distrito", "concelho"],
-        color="Estado",
+        color="estado",
         zoom=6,
         height=900
     )
