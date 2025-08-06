@@ -57,8 +57,8 @@ def index():
     x="Distrito",
     y="TotalMeios",
     title="Total de Meios por Distrito"
-)
-grafico2_html = grafico2.to_html(full_html=False)
+   )
+    grafico2_html = grafico2.to_html(full_html=False)
 
     # Mapa interativo
     mapa = px.scatter_mapbox(
