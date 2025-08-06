@@ -7,26 +7,51 @@ import requests
 app = Flask(__name__)
 
 # Função para obter e preparar os dados
+import requests
+import pandas as pd
+
 def obter_dados():
-    # Exemplo: API de dados fictícios ou pode ser substituído por um CSV local
-    url = "https://3pscoutsteste.abranco.pt/api/ANEPCAPI/GetPointsGetOcorrenciasActivasLista"  # ⚠️ Substitui por uma URL real se tiveres uma API
+    url = "https://3pscoutsteste.abranco.pt/api/ANEPCAPI/GetPointsGetOcorrenciasActivasLista"
+    
     try:
+        # 🚀 1. Requisição à API
         response = requests.get(url)
         response.raise_for_status()
         dados_json = response.json()
 
+        # 📦 2. Converter em DataFrame
         df = pd.DataFrame(dados_json)
 
-        # ✅ Correções com os teus nomes de campo
-        df["DataOcorrencia"] = pd.to_datetime(df["DataOcorrencia"], format="%d-%m-%Y %H:%M:%S")
-        df["Latitude"] = df["Latitude"].str.replace(",", ".").astype(float)
-        df["Longitude"] = df["Longitude"].str.replace(",", ".").astype(float)
-
-        # Podes adaptar aqui o campo que vais visualizar no gráfico
-        df["TotalMeios"] = (
-            df["NumeroMeiosTerrestresEnvolvidos"].fillna(0)
-            + df["NumeroMeiosAereosEnvolvidos"].fillna(0)
+        # 🔠 3. Normalizar nomes de colunas
+        df.columns = (
+            df.columns
+            .str.strip()
+            .str.lower()
+            .str.replace(" ", "")
         )
+
+        # 🕒 4. Converter datas e coordenadas
+        df["dataocorrencia"] = pd.to_datetime(df["dataocorrencia"], format="%d-%m-%Y %H:%M:%S", errors="coerce")
+        df["latitude"] = df["latitude"].astype(str).str.replace(",", ".").astype(float)
+        df["longitude"] = df["longitude"].astype(str).str.replace(",", ".").astype(float)
+
+        # 🛠️ 5. Criar campo de total de meios
+        df["totalmeios"] = (
+            df["numeromeiosterrestresenvolvidos"].fillna(0)
+            + df["numeromeiosaereosenvolvidos"].fillna(0)
+        )
+
+        # 🧼 6. Padronizar nome de estado
+        if "estadoocorrencia" not in df.columns and "estado" in df.columns:
+            df["estadoocorrencia"] = df["estado"]
+
+        df["estadoocorrencia"] = df["estadoocorrencia"].fillna("Desconhecido").str.title()
+
+        # ✅ 7. Verificações finais
+        colunas_obrigatorias = ["latitude", "longitude", "natureza", "distrito", "concelho", "estadoocorrencia"]
+        faltantes = [col for col in colunas_obrigatorias if col not in df.columns]
+        if faltantes:
+            raise ValueError(f"Colunas obrigatórias em falta: {faltantes}")
 
         return df
 
