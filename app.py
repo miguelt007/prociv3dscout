@@ -12,7 +12,7 @@ def coluna_segura(df, coluna, default=0):
 
 # 🔄 Nova função para obter dados da API ProCiv
 def obter_dados_prociv():
-    url = "https://prociv-agserver.geomai.mai.gov.pt/arcgis/rest/services/Ocorrencias_Base/FeatureServer/0/query"
+    url = "https://prociv-agserver.geomai.mai.gov.pt/arcgis/rest/services/Ocorrencias_Base/FeatureServer/0/query?f=geojson&where=0=0&outFields=*"
     params = {
         "f": "geojson",
         "where": "0=0",
