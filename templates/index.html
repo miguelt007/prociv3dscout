@@ -1,16 +1,23 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt">
 <head>
-  <meta charset="UTF-8">
-  <title>Dashboard ANEPC</title>
+    <meta charset="UTF-8">
+    <title>Ocorrências ANEPC</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f8f9fa; }
+        h1 { color: #333; }
+        .grafico, .mapa { margin-top: 30px; padding: 20px; background-color: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    </style>
 </head>
 <body>
-  <h1>🚨 Ocorrências Ativas ANEPC</h1>
+    <h1>Visualização das Ocorrências ANEPC</h1>
 
-  <h2>📊 Gráfico por Tipo</h2>
-  {{ grafico|safe }}
+    <div class="grafico">
+        {{ grafico|safe }}
+    </div>
 
-  <h2>🗺️ Mapa de Ocorrências</h2>
-  {{ mapa|safe }}
+    <div class="mapa">
+        {{ mapa|safe }}
+    </div>
 </body>
 </html>
