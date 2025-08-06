@@ -52,11 +52,13 @@ def index():
 
     # 🧾 Dados para tabela
     df_filtrado = df[["dataocorrencia", "natureza", "distrito", "concelho", "estadoocorrencia", "totalmeios", "totaloperacionais"]].dropna()
+    geojson_data = geojson  # já está em formato dict
 
     return render_template(
         "index.html",
         grafico_labels=grafico_labels,
         grafico_dados=grafico_dados,
+        geojson_data=geojson_data,
         ocorrencias=df_filtrado.to_dict(orient="records"),
         total_ocorrencias=total_ocorrencias,
         total_operacionais=total_operacionais,
