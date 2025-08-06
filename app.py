@@ -15,12 +15,12 @@ def obter_dados():
         response.raise_for_status()
         dados_json = response.json()
 
-        # Converter em DataFrame
         df = pd.DataFrame(dados_json)
 
-        # Exemplos de tratamento (modifica conforme necessário)
-        df["data"] = pd.to_datetime(df["data"])
-        df["valor"] = df["valor"].astype(float)
+        # ✅ Corrigido: usar o nome correto da coluna
+        df["DataOcorrencia"] = pd.to_datetime(df["DataOcorrencia"])
+        df["valor"] = df["valor"].astype(float)  # ou outro nome, se aplicável
+
         return df
 
     except Exception as e:
@@ -36,7 +36,7 @@ def index():
         return "<h2>Não foi possível carregar os dados.</h2>"
 
     # Criar gráfico com Plotly
-    grafico = px.line(df, x="data", y="valor", title="Evolução dos Valores")
+    grafico = px.line(df, x="DataOcorrencia", y="valor", title="Evolução dos Valores")
     grafico_html = grafico.to_html(full_html=False)
 
     return render_template("index.html", grafico=grafico_html)
