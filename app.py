@@ -128,7 +128,7 @@ mapa_html = mapa.to_html(full_html=False)
         estados=estados,
         distrito_selecionado=distrito,
         estado_selecionado=estado
-    )
+)
 # Executar a aplicação
 if __name__ == "__main__":
     app.run(debug=True)
