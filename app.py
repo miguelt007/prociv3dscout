@@ -100,18 +100,18 @@ grafico2.update_traces(textposition="outside")
 # Exportar para HTML
 grafico2_html = grafico2.to_html(full_html=False)
 
-    mapa = px.scatter_mapbox(
-        df_filtrado,
-        lat="latitude",
-        lon="longitude",
-        hover_name="natureza",
-        hover_data=["estadoocorrencia", "distrito", "concelho"],
-        color="estado",
-        zoom=6,
-        height=750
-    )
-    mapa.update_layout(mapbox_style="open-street-map")
-    mapa_html = mapa.to_html(full_html=False)
+mapa = px.scatter_mapbox(
+    df_filtrado,
+    lat="latitude",
+    lon="longitude",
+    hover_name="natureza",
+    hover_data=["estadoocorrencia", "distrito", "concelho"],
+    color="estado",
+    zoom=6,
+    height=750
+)
+mapa.update_layout(mapbox_style="open-street-map")
+mapa_html = mapa.to_html(full_html=False)
 
     return render_template(
         "index.html",
