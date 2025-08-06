@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>Dashboard de Ocorrências</title>
 
-    <!-- Responsividade dos gráficos -->
     <script>
         window.addEventListener('resize', () => {
             try {
@@ -20,7 +19,6 @@
         });
     </script>
 
-    <!-- Estilo personalizado -->
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -31,6 +29,36 @@
         h1 {
             text-align: center;
             margin-bottom: 40px;
+        }
+
+        .stats-cards {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            min-width: 150px;
+            text-align: center;
+            flex: 1;
+        }
+
+        .card h3 {
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .card p {
+            font-size: 22px;
+            font-weight: bold;
+            color: #007BFF;
         }
 
         form {
@@ -99,18 +127,6 @@
             height: 400px;
         }
 
-        .mapa canvas {
-            height: 750px !important;
-            width: 100% !important;
-            display: block;
-        }
-
-        .mapa svg {
-            width: 100% !important;
-            height: auto;
-            display: block;
-        }
-
         @media (max-width: 900px) {
             .container {
                 flex-direction: column;
@@ -124,6 +140,34 @@
 </head>
 <body>
     <h1>Ocorrências em Tempo Real</h1>
+
+    <!-- Cartões estatísticos -->
+    <div class="stats-cards">
+        <div class="card">
+            <h3>Total Ocorrências</h3>
+            <p>{{ total_ocorrencias }}</p>
+        </div>
+        <div class="card">
+            <h3>Total Operacionais</h3>
+            <p>{{ total_operacionais }}</p>
+        </div>
+        <div class="card">
+            <h3>Total Veículos</h3>
+            <p>{{ total_veiculos }}</p>
+        </div>
+        <div class="card">
+            <h3>Total Aéreos</h3>
+            <p>{{ total_aereos }}</p>
+        </div>
+        <div class="card">
+            <h3>Total Aquáticos</h3>
+            <p>{{ total_aquaticos }}</p>
+        </div>
+        <div class="card">
+            <h3>Total Incêndios</h3>
+            <p>{{ total_incendios }}</p>
+        </div>
+    </div>
 
     <!-- Filtros -->
     <form method="GET" action="/">
@@ -148,12 +192,10 @@
 
     <!-- Conteúdo principal -->
     <div class="container">
-        <!-- Mapa Interativo -->
         <div class="mapa">
             {{ mapa|safe }}
         </div>
 
-        <!-- Gráficos -->
         <div class="grafico-container">
             {{ grafico|safe }}
             {% if grafico2 %}
