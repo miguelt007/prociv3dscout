@@ -66,7 +66,7 @@ mapa = px.scatter_mapbox(
 mapa.update_layout(mapbox_style="open-street-map")
 mapa_html = mapa.to_html(full_html=False)
 
-    return render_template("index.html", grafico=grafico_html)
+ return render_template("index.html", grafico=grafico_html, mapa=mapa_html)
 
 # Executar a aplicação
 if __name__ == "__main__":
