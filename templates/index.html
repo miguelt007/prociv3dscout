@@ -2,15 +2,21 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <title>Lista de Ocorrências</title>
+    <title>Dashboard ProCiv</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- DataTables CSS & JS -->
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- DataTables -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
-    <!-- DataTables Configuração -->
     <script>
         $(document).ready(function () {
             $('#tabela-ocorrencias').DataTable({
@@ -27,31 +33,108 @@
         body {
             font-family: Arial, sans-serif;
             margin: 40px;
-            background-color: #f9f9f9;
+            background-color: #f4f4f4;
         }
 
-        h2 {
-            color: #333;
+        .cartoes {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .cartao {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            flex: 1;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        #mapa {
+            height: 400px;
+            margin-bottom: 40px;
+            border-radius: 8px;
+        }
+
+        .grafico-container {
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 40px;
         }
 
         table.dataTable thead th {
             background-color: #eaeaea;
             color: #333;
         }
-
-        .dataTables_wrapper .dataTables_filter {
-            float: right;
-            text-align: right;
-        }
-
-        .dataTables_wrapper .dataTables_paginate {
-            float: right;
-            text-align: right;
-        }
     </style>
 </head>
 <body>
 
+    <!-- Cartões -->
+    <div class="cartoes">
+        <div class="cartao">
+            <h3>Total Ocorrências</h3>
+            <p>{{ total_ocorrencias }}</p>
+        </div>
+        <div class="cartao">
+            <h3>Operacionais</h3>
+            <p>{{ total_operacionais }}</p>
+        </div>
+        <div class="cartao">
+            <h3>Meios</h3>
+            <p>{{ total_meios }}</p>
+        </div>
+    </div>
+
+    <!-- Mapa -->
+    <div id="mapa"></div>
+    <script>
+        const mapa = L.map('mapa').setView([39.5, -8], 7);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(mapa);
+
+        const geojsonUrl = "https://prociv-agserver.geomai.mai.gov.pt/arcgis/rest/services/Ocorrencias_Base/FeatureServer/0/query?f=geojson&where=0=0&outFields=*";
+
+        fetch(geojsonUrl)
+            .then(res => res.json())
+            .then(data => {
+                L.geoJSON(data, {
+                    onEachFeature: function (feature, layer) {
+                        const props = feature.properties;
+                        layer.bindPopup(`<strong>${props.Natureza}</strong><br>${props.Concelho}, ${props.Distrito}`);
+                    }
+                }).addTo(mapa);
+            });
+    </script>
+
+    <!-- Gráfico -->
+    <div class="grafico-container">
+        <canvas id="graficoOcorrencias"></canvas>
+    </div>
+    <script>
+        const ctx = document.getElementById('graficoOcorrencias').getContext('2d');
+        const grafico = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: {{ grafico_labels | safe }},
+                datasets: [{
+                    label: 'Ocorrências por Distrito',
+                    data: {{ grafico_dados | safe }},
+                    backgroundColor: 'rgba(255, 99, 132, 0.5)'
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    </script>
+
+    <!-- Tabela -->
     {% if ocorrencias and ocorrencias|length > 0 %}
         <h2>📋 Lista de Ocorrências</h2>
         <div style="overflow-x: auto;">
