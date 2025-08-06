@@ -90,10 +90,9 @@
     <label for="filtroNatureza">Natureza:</label>
     <select id="filtroNatureza">
       <option value="">Todas</option>
-      {% for o in ocorrencias %}
-        {% if o.natureza %}
-          <option value="{{ o.natureza }}">{{ o.natureza }}</option>
-        {% endif %}
+      {% set naturezas_unicas = ocorrencias | map(attribute='natureza') | select | unique | list | sort %}
+      {% for n in naturezas_unicas %}
+      <option value="{{ n }}">{{ n }}</option>
       {% endfor %}
     </select>
   </div>
