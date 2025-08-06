@@ -18,6 +18,7 @@ def obter_dados():
 
         # 📦 Converter em DataFrame
         df = pd.DataFrame(dados_json)
+        print(df.columns)
 
         # 🔠 Normalizar nomes de colunas
         df.columns = (
