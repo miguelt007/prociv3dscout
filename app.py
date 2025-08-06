@@ -37,7 +37,7 @@ def index():
     df["distrito"] = df["Distrito"]
     df["concelho"] = df["Concelho"]
     df["estadoocorrencia"] = df["EstadoOcorrencia"]
-    df["totalmeios"] = pd.to_numeric(df["MeiosTerrestresEnvolvidos"], errors="coerce").fillna(0).astype(int)
+    df["totalmeios"] = pd.to_numeric(df["NumeroMeiosTerrestresEnvolvidos"], errors="coerce").fillna(0).astype(int)
     df["totaloperacionais"] = pd.to_numeric(df["OperacionaisTerrestresEnvolvidos"], errors="coerce").fillna(0).astype(int)
 
     # 📊 Dados para gráfico
