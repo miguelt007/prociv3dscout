@@ -35,46 +35,52 @@ def obter_dados():
         return pd.DataFrame()
 
 # Rota principal
-@app.route("/")
+@app.route("/", methods=["GET"])
 def index():
-    df = obter_dados()
+    distrito = request.args.get("distrito")
+    estado = request.args.get("estado")
 
-    if df.empty:
-        return "<h2>Não foi possível carregar os dados.</h2>"
+    # Aplica os filtros
+    df_filtrado = df.copy()
+    if distrito:
+        df_filtrado = df_filtrado[df_filtrado["Distrito"] == distrito]
+    if estado:
+        df_filtrado = df_filtrado[df_filtrado["EstadoOcorrencia"] == estado]
 
-    # Criar gráfico com Plotly
-    grafico = px.bar(
-        df,
-        x="DataOcorrencia",
-        y="TotalMeios",
-        title="Meios Envolvidos por Ocorrência",
-        color="Distrito"
-    )
+    # Lista única para preencher o dropdown
+    distritos = sorted(df["Distrito"].unique())
+    estados = sorted(df["EstadoOcorrencia"].unique())
+
+    # Recriar gráficos com df_filtrado
+    grafico = px.bar(df_filtrado, x="DataOcorrencia", y="TotalMeios", color="Distrito", title="Meios Envolvidos por Ocorrência")
     grafico_html = grafico.to_html(full_html=False)
 
-    grafico2 = px.bar(  # ou outro tipo de gráfico
-    df,
-    x="Distrito",
-    y="TotalMeios",
-    title="Total de Meios por Distrito"
-   )
+    grafico2 = px.bar(df_filtrado, x="Distrito", y="TotalMeios", title="Total de Meios por Distrito")
     grafico2_html = grafico2.to_html(full_html=False)
 
-    # Mapa interativo
     mapa = px.scatter_mapbox(
-        df,
+        df_filtrado,
         lat="Latitude",
         lon="Longitude",
         hover_name="Natureza",
         hover_data=["EstadoOcorrencia", "Distrito", "Concelho"],
         color="Estado",
         zoom=6,
-        height=400
+        height=900
     )
     mapa.update_layout(mapbox_style="open-street-map")
     mapa_html = mapa.to_html(full_html=False)
 
-    return render_template("index.html", mapa=mapa_html, grafico=grafico_html, grafico2=grafico2_html)
+    return render_template(
+        "index.html",
+        mapa=mapa_html,
+        grafico=grafico_html,
+        grafico2=grafico2_html,
+        distritos=distritos,
+        estados=estados,
+        distrito_selecionado=distrito,
+        estado_selecionado=estado
+    )
 
 # Executar a aplicação
 if __name__ == "__main__":
