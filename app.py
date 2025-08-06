@@ -126,7 +126,7 @@ def index():
         estado_selecionado=estado,
         total_ocorrencias=len(df_filtrado),
         total_operacionais=int(df_filtrado["numeromeiosterrestresenvolvidos"].sum()),
-        total_veiculos=int(df_filtrado["numeroveiculosenvolvidos"].sum()),
+        total_veiculos = int(df_filtrado.get("NumeroMeiosTerrestresEnvolvidos", pd.Series([0])).sum()),
         total_aereos=int(df_filtrado["numeromeiosaereosenvolvidos"].sum()),
         total_aquaticos=int(df_filtrado["numeromeiosaquaticosenvolvidos"].sum()),
         total_incendios=int(df_filtrado["natureza"].str.contains("incêndio", case=False).sum())
