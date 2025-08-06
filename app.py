@@ -119,15 +119,15 @@ mapa.update_layout(mapbox_style="open-street-map")
 # Gerar o HTML do mapa
 mapa_html = mapa.to_html(full_html=False)
 
-    return render_template(
-        "index.html",
-        mapa=mapa_html,
-        grafico=grafico_html,
-        grafico2=grafico2_html,
-        distritos=distritos,
-        estados=estados,
-        distrito_selecionado=distrito,
-        estado_selecionado=estado
+ return render_template(
+     "index.html",
+     mapa=mapa_html,
+     grafico=grafico_html,
+     grafico2=grafico2_html,
+     distritos=distritos,
+     estados=estados,
+     distrito_selecionado=distrito,
+     estado_selecionado=estado
 )
 # Executar a aplicação
 if __name__ == "__main__":
