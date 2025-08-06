@@ -32,7 +32,7 @@ def index():
     df = pd.DataFrame(dados)
 
     # 🧹 Limpeza e tratamento
-    df["dataocorrencia"] = pd.to_datetime(df["DataOcorrencia"], errors="coerce")
+    df["dataocorrencia"] = pd.to_datetime(df["DataInicioOcorrencia"], errors="coerce")
     df["natureza"] = df["Natureza"]
     df["distrito"] = df["Distrito"]
     df["concelho"] = df["Concelho"]
