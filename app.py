@@ -43,7 +43,7 @@ def index():
         return "<h2>Não foi possível carregar os dados.</h2>"
 
     # Criar gráfico com Plotly
-    grafico = px.line(
+    grafico = px.bar(
         df,
         x="DataOcorrencia",
         y="TotalMeios",
@@ -51,6 +51,14 @@ def index():
         color="Distrito"
     )
     grafico_html = grafico.to_html(full_html=False)
+
+    grafico2 = px.bar(  # ou outro tipo de gráfico
+    df,
+    x="Distrito",
+    y="TotalMeios",
+    title="Total de Meios por Distrito"
+)
+grafico2_html = grafico2.to_html(full_html=False)
 
     # Mapa interativo
     mapa = px.scatter_mapbox(
