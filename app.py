@@ -69,9 +69,9 @@ def index():
     df = obter_dados()
     df_filtrado = df.copy()
     if distrito:
-        df_filtrado = df_filtrado[df_filtrado["Distrito"] == distrito]
+        df_filtrado = df_filtrado[df_filtrado["distrito"] == distrito]
     if estado:
-        df_filtrado = df_filtrado[df_filtrado["EstadoOcorrencia"] == estado]
+        df_filtrado = df_filtrado[df_filtrado["estadoocorrencia"] == estado]
 
     # Lista única para preencher o dropdown
     distritos = sorted(df["distrito"].unique())
