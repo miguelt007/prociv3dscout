@@ -122,8 +122,14 @@ def index():
         distritos=distritos,
         estados=estados,
         distrito_selecionado=distrito,
-        estado_selecionado=estado
-    )
+        estado_selecionado=estado,
+        total_ocorrencias=len(df_filtrado),
+        total_operacionais=int(df_filtrado["numeromeiosterrestresenvolvidos"].sum()),
+        total_veiculos=int(df_filtrado["numeroveiculosenvolvidos"].sum()),
+        total_aereos=int(df_filtrado["numeromeiosaereosenvolvidos"].sum()),
+        total_aquaticos=int(df_filtrado["numeromeiosaquaticosenvolvidos"].sum()),
+        total_incendios=int(df_filtrado["natureza"].str.contains("incêndio", case=False).sum())
+)
 
 # Executar a aplicação
 if __name__ == "__main__":
