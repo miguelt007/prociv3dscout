@@ -1,7 +1,7 @@
-from flask import Flask, render_template, requests
+from flask import Flask, render_template
+import requests
 import pandas as pd
 import plotly.express as px
-import requests
 
 app = Flask(__name__)
 
