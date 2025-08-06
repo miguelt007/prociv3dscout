@@ -59,28 +59,25 @@ def obter_dados_prociv():
         return pd.DataFrame()        
 # Rota principal
 @app.route("/", methods=["GET", "POST"])
-@app.route("/", methods=["GET", "POST"])
 def index():
     df = obter_dados_prociv()
 
-    # Verificar se o DataFrame tem dados
+    # Filtros
+    distrito = request.form.get("distrito", "Todos")
+    estado = request.form.get("estado", "Todos")
+
+    # Verificação de dados
     if df.empty:
+        df_filtrado = pd.DataFrame()
         distritos = []
         estados = []
-        df_filtrado = pd.DataFrame()
     else:
-        # Filtros do formulário
-        distrito = request.form.get("distrito", "Todos")
-        estado = request.form.get("estado", "Todos")
-
-        # Filtro defensivo
         df_filtrado = df.copy()
         if distrito != "Todos" and "distrito" in df.columns:
             df_filtrado = df_filtrado[df_filtrado["distrito"] == distrito]
         if estado != "Todos" and "estadoocorrencia" in df.columns:
             df_filtrado = df_filtrado[df_filtrado["estadoocorrencia"] == estado]
 
-        # Listas para dropdowns
         distritos = sorted(df["distrito"].dropna().unique()) if "distrito" in df.columns else []
         estados = sorted(df["estadoocorrencia"].dropna().unique()) if "estadoocorrencia" in df.columns else []
 
@@ -101,52 +98,57 @@ def index():
     )
     total_aereos = get_safe_sum(df_filtrado, "numeromeiosaereosenvolvidos")
     total_meios_aquaticos = get_safe_sum(df_filtrado, "numeromeiosaquaticos")
-    total_incendios = get_safe_count(df_filtrado, "natureza", "incendio")
+    total_incendios = get_safe_count(df_filtrado, "natureza", "Incêndio")
 
-    # 📍 Dropdowns
-    distritos = sorted(df["distrito"].dropna().unique())
-    estados = sorted(df["estadoocorrencia"].dropna().unique())
+    # Gráfico 1: Meios por ocorrência
+    if "dataocorrencia" in df_filtrado.columns and "totalmeios" in df_filtrado.columns:
+        grafico = px.bar(
+            df_filtrado,
+            x="dataocorrencia",
+            y="totalmeios",
+            color="distrito" if "distrito" in df_filtrado.columns else None,
+            title="Meios Envolvidos por Ocorrência"
+        )
+        grafico_html = grafico.to_html(full_html=False)
+    else:
+        grafico_html = "<div>Gráfico 1 indisponível</div>"
 
-    # 📊 Gráfico 1: Meios por ocorrência
-    grafico = px.bar(
-        df_filtrado,
-        x="dataocorrencia",
-        y="totalmeios",
-        color="distrito",
-        title="Meios Envolvidos por Ocorrência"
-    )
-    grafico_html = grafico.to_html(full_html=False)
+    # Gráfico 2: Total por distrito
+    if "distrito" in df_filtrado.columns and "totalmeios" in df_filtrado.columns:
+        df_barras = df_filtrado.groupby("distrito", as_index=False)["totalmeios"].sum()
+        df_barras = df_barras[df_barras["totalmeios"] > 0]
 
-    # 📊 Gráfico 2: Total por distrito
-    df_barras = df_filtrado.groupby("distrito", as_index=False)["totalmeios"].sum()
-    df_barras = df_barras[df_barras["totalmeios"] > 0]
+        grafico2 = px.bar(
+            df_barras,
+            x="distrito",
+            y="totalmeios",
+            title="Total de Meios por Distrito",
+            text="totalmeios"
+        )
+        grafico2.update_traces(textposition="outside")
+        grafico2.update_layout(yaxis=dict(range=[0, df_barras["totalmeios"].max() * 1.2]))
+        grafico2_html = grafico2.to_html(full_html=False)
+    else:
+        grafico2_html = "<div>Gráfico 2 indisponível</div>"
 
-    grafico2 = px.bar(
-        df_barras,
-        x="distrito",
-        y="totalmeios",
-        title="Total de Meios por Distrito",
-        text="totalmeios"
-    )
-    grafico2.update_traces(textposition="outside")
-    grafico2.update_layout(yaxis=dict(range=[0, df_barras["totalmeios"].max() * 1.2]))
-    grafico2_html = grafico2.to_html(full_html=False)
+    # Mapa
+    if {"latitude", "longitude", "natureza"}.issubset(df_filtrado.columns):
+        mapa = px.scatter_mapbox(
+            df_filtrado,
+            lat="latitude",
+            lon="longitude",
+            hover_name="natureza",
+            hover_data=["estadoocorrencia", "distrito", "concelho"],
+            color="estadoocorrencia" if "estadoocorrencia" in df_filtrado.columns else None,
+            zoom=6,
+            height=750
+        )
+        mapa.update_layout(mapbox_style="open-street-map")
+        mapa_html = mapa.to_html(full_html=False)
+    else:
+        mapa_html = "<div>Mapa indisponível</div>"
 
-    # 🗺️ Mapa
-    mapa = px.scatter_mapbox(
-        df_filtrado,
-        lat="latitude",
-        lon="longitude",
-        hover_name="natureza",
-        hover_data=["estadoocorrencia", "distrito", "concelho"],
-        color="estado",
-        zoom=6,
-        height=750
-    )
-    mapa.update_layout(mapbox_style="open-street-map")
-    mapa_html = mapa.to_html(full_html=False)
-
-    # 🧾 Renderizar template
+    # Renderizar template
     return render_template(
         "index.html",
         mapa=mapa_html,
@@ -162,7 +164,7 @@ def index():
         total_aereos=total_aereos,
         total_meios_aquaticos=total_meios_aquaticos,
         total_incendios=total_incendios
-)
-# 🚀 Executar a aplicação
-if __name__ == "__main__":
+    )
+  # 🚀 Executar a aplicação
+  if __name__ == "__main__":
     app.run(debug=True)
