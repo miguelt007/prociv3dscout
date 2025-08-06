@@ -41,6 +41,7 @@ def index():
     estado = request.args.get("estado")
 
     # Aplica os filtros
+    df = obter_dados()
     df_filtrado = df.copy()
     if distrito:
         df_filtrado = df_filtrado[df_filtrado["Distrito"] == distrito]
