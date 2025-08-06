@@ -70,7 +70,7 @@
     </div>
     <div class="card">
       <h2>{{ total_meios }}</h2>
-      <p>Total de Meios Terrestres</p>
+      <pTotal de Meios Terrestres</p>
     </div>
   </div>
 
@@ -79,9 +79,9 @@
 
   <!-- 🔍 Filtros -->
   <div class="filtros">
-    <label for="filtroDistrito">Distrito:</label>
-    <select id="filtroDistrito">
-      <option value="">Todos</option>
+    <label for="filtroSubRegiao">Sub Região:</label>
+    <select id="filtroSubRegiao">
+      <option value="">Todas</option>
       {% for d in grafico_labels %}
       <option value="{{ d }}">{{ d }}</option>
       {% endfor %}
@@ -99,7 +99,7 @@
   </div>
 
   <!-- 📊 Gráfico -->
-  <canvas id="graficoDistritos"></canvas>
+  <canvas id="graficoSubRegioes"></canvas>
 
   <!-- 📋 Tabela -->
   <h2>Detalhes das Ocorrências</h2>
@@ -108,7 +108,7 @@
       <tr>
         <th>Data</th>
         <th>Natureza</th>
-        <th>Distrito</th>
+        <th>Sub Região</th>
         <th>Concelho</th>
         <th>Estado</th>
         <th>Meios</th>
@@ -128,13 +128,13 @@
     const tabelaBody = document.getElementById("tabelaOcorrencias");
 
     // Inicializar gráfico
-    const ctx = document.getElementById('graficoDistritos').getContext('2d');
+    const ctx = document.getElementById('graficoSubRegioes').getContext('2d');
     let grafico = new Chart(ctx, {
       type: 'bar',
       data: {
         labels: [],
         datasets: [{
-          label: 'Ocorrências por distrito',
+          label: 'Ocorrências por Sub Região',
           data: [],
           backgroundColor: 'rgba(54, 162, 235, 0.6)'
         }]
@@ -154,7 +154,7 @@
           <tr>
             <td>${o.dataocorrencia}</td>
             <td>${o.natureza}</td>
-            <td>${o.distrito}</td>
+            <td>${o["Sub Região"]}</td>
             <td>${o.concelho}</td>
             <td>${o.estadoocorrencia}</td>
             <td>${o.totalmeios}</td>
@@ -167,8 +167,8 @@
     function atualizarGrafico(filtradas) {
       const contagem = {};
       filtradas.forEach(o => {
-        if (o.distrito) {
-          contagem[o.distrito] = (contagem[o.distrito] || 0) + 1;
+        if (o["Sub Região"]) {
+          contagem[o["Sub Região"]] = (contagem[o["Sub Região"]] || 0) + 1;
         }
       });
 
@@ -181,11 +181,11 @@
     }
 
     function aplicarFiltros() {
-      const distrito = document.getElementById("filtroDistrito").value;
+      const subregiao = document.getElementById("filtroSubRegiao").value;
       const natureza = document.getElementById("filtroNatureza").value;
 
       const filtradas = todasOcorrencias.filter(o => {
-        return (!distrito || o.distrito === distrito) &&
+        return (!subregiao || o["Sub Região"] === subregiao) &&
                (!natureza || o.natureza === natureza);
       });
 
@@ -193,7 +193,7 @@
       atualizarGrafico(filtradas);
     }
 
-    document.getElementById("filtroDistrito").addEventListener("change", aplicarFiltros);
+    document.getElementById("filtroSubRegiao").addEventListener("change", aplicarFiltros);
     document.getElementById("filtroNatureza").addEventListener("change", aplicarFiltros);
 
     // Render inicial
@@ -212,7 +212,7 @@
         const props = feature.properties || {};
         layer.bindPopup(`
           <strong>${props.Natureza || 'Sem natureza'}</strong><br>
-          ${props.Concelho || 'Sem concelho'}, ${props.Distrito || 'Sem distrito'}
+          ${props.Concelho || 'Sem concelho'}, ${props.CSREPC || 'Sem sub região'}
         `);
       }
     }).addTo(map);
