@@ -44,29 +44,29 @@ def index():
 
     # Criar gráfico com Plotly
     grafico = px.line(
-    df,
-    x="DataOcorrencia",
-    y="TotalMeios",
-    title="Meios Envolvidos por Ocorrência",
-    color="Distrito"
-)
-grafico_html = grafico.to_html(full_html=False)
+        df,
+        x="DataOcorrencia",
+        y="TotalMeios",
+        title="Meios Envolvidos por Ocorrência",
+        color="Distrito"
+    )
+    grafico_html = grafico.to_html(full_html=False)
 
-# Mapa interativo
-mapa = px.scatter_mapbox(
-    df,
-    lat="Latitude",
-    lon="Longitude",
-    hover_name="Natureza",
-    hover_data=["EstadoOcorrencia", "Distrito", "Concelho"],
-    color="Estado",
-    zoom=6,
-    height=400
-)
-mapa.update_layout(mapbox_style="open-street-map")
-mapa_html = mapa.to_html(full_html=False)
+    # Mapa interativo
+    mapa = px.scatter_mapbox(
+        df,
+        lat="Latitude",
+        lon="Longitude",
+        hover_name="Natureza",
+        hover_data=["EstadoOcorrencia", "Distrito", "Concelho"],
+        color="Estado",
+        zoom=6,
+        height=400
+    )
+    mapa.update_layout(mapbox_style="open-street-map")
+    mapa_html = mapa.to_html(full_html=False)
 
- return render_template("index.html", grafico=grafico_html, mapa=mapa_html)
+    return render_template("index.html", grafico=grafico_html, mapa=mapa_html)
 
 # Executar a aplicação
 if __name__ == "__main__":
