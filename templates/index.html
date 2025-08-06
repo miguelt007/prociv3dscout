@@ -5,31 +5,110 @@
   <title>Prociv3DScout</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
-    #map { height: 500px; margin-bottom: 30px; }
-    canvas { max-width: 600px; margin: auto; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    #map {
+      height: 500px;
+      margin-bottom: 30px;
+    }
+    canvas {
+      max-width: 600px;
+      margin: auto;
+      display: block;
+    }
+    .cards {
+      display: flex;
+      justify-content: space-around;
+      margin: 30px 0;
+    }
+    .card {
+      background: #f0f0f0;
+      padding: 20px;
+      border-radius: 8px;
+      width: 30%;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 30px;
+    }
+    th, td {
+      padding: 8px;
+      border: 1px solid #ccc;
+      text-align: left;
+    }
+    th {
+      background-color: #eee;
+    }
   </style>
 </head>
 <body>
-  <h1>Ocorrências Prociv</h1>
+  <h1>📍 Ocorrências ProCiv</h1>
 
-  <!-- Mapa -->
+  <!-- 🧮 Cartões resumo -->
+  <div class="cards">
+    <div class="card">
+      <h2>{{ total_ocorrencias }}</h2>
+      <p>Total de Ocorrências</p>
+    </div>
+    <div class="card">
+      <h2>{{ total_operacionais }}</h2>
+      <p>Total de Operacionais</p>
+    </div>
+    <div class="card">
+      <h2>{{ total_meios }}</h2>
+      <p>Total de Meios Terrestres</p>
+    </div>
+  </div>
+
+  <!-- 🗺️ Mapa -->
   <div id="map"></div>
 
-  <!-- Gráfico -->
+  <!-- 📊 Gráfico -->
   <canvas id="graficoDistritos"></canvas>
 
-  <!-- Leaflet.js -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- 📋 Tabela -->
+  <h2>Detalhes das Ocorrências</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Data</th>
+        <th>Natureza</th>
+        <th>Distrito</th>
+        <th>Concelho</th>
+        <th>Estado</th>
+        <th>Meios</th>
+        <th>Operacionais</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for o in ocorrencias %}
+      <tr>
+        <td>{{ o.dataocorrencia }}</td>
+        <td>{{ o.natureza }}</td>
+        <td>{{ o.distrito }}</td>
+        <td>{{ o.concelho }}</td>
+        <td>{{ o.estadoocorrencia }}</td>
+        <td>{{ o.totalmeios }}</td>
+        <td>{{ o.totaloperacionais }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 
-  <!-- Chart.js -->
+  <!-- Scripts -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <script>
-    // Dados do gráfico vindos do backend
+    // 📊 Dados do gráfico
     const graficoLabels = {{ grafico_labels | tojson }};
     const graficoDados = {{ grafico_dados | tojson }};
 
-    // Renderizar gráfico
     const ctx = document.getElementById('graficoDistritos').getContext('2d');
     new Chart(ctx, {
       type: 'bar',
@@ -49,17 +128,16 @@
       }
     });
 
-    // Inicializar mapa
-    const map = L.map('map').setView([39.5, -8], 7); // Centro de Portugal
+    // 🗺️ Mapa
+    const map = L.map('map').setView([39.5, -8], 7);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors'
     }).addTo(map);
 
-    // Adicionar ocorrências ao mapa
-    const ocorrencias = {{ geojson_data | tojson }}; // Certifica-te que passas isto no app.py
+    const ocorrenciasGeo = {{ geojson_data | tojson }};
 
-    L.geoJSON(ocorrencias, {
+    L.geoJSON(ocorrenciasGeo, {
       onEachFeature: function (feature, layer) {
         const props = feature.properties || {};
         layer.bindPopup(`
