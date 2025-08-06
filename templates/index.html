@@ -3,16 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <title>Dashboard de Ocorrências</title>
+
+    <!-- Responsividade dos gráficos -->
     <script>
-    window.addEventListener('resize', () => {
-        const plots = document.querySelectorAll('.plotly-graph-div');
-        plots.forEach(p => {
-            if (window.Plotly && Plotly.Plots && Plotly.Plots.resize) {
-                Plotly.Plots.resize(p);
+        window.addEventListener('resize', () => {
+            try {
+                const plots = document.querySelectorAll('.plotly-graph-div');
+                plots.forEach(p => {
+                    if (window.Plotly && Plotly.Plots && Plotly.Plots.resize) {
+                        Plotly.Plots.resize(p);
+                    }
+                });
+            } catch (e) {
+                console.warn("Erro ao redimensionar gráfico:", e);
             }
         });
-    });
-</script>
+    </script>
+
+    <!-- Estilo personalizado -->
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -25,26 +33,61 @@
             margin-bottom: 40px;
         }
 
+        form {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        select {
+            padding: 6px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            padding: 8px 16px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
         .container {
             display: flex;
             gap: 30px;
             flex-wrap: wrap;
         }
 
-     .mapa {
-    flex: 1;
-    max-width: 100%;
-    min-height: 750px; /* ou 650px, para respirar */
-    background-color: #fff;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 0 8px rgba(0,0,0,0.1);
-    overflow: hidden; /* evita transbordar */
-}
-   .grafico-container {
+        .mapa {
+            flex: 1;
+            max-width: 100%;
+            min-height: 750px;
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .grafico-container {
             display: flex;
             flex-direction: column;
             gap: 25px;
+            flex: 1;
+            min-width: 300px;
         }
 
         iframe {
@@ -57,19 +100,18 @@
         }
 
         .mapa canvas {
-           height: 750px !important;
-           width: 100% !important;
-           display: block;
-       }
+            height: 750px !important;
+            width: 100% !important;
+            display: block;
+        }
 
         .mapa svg {
-          width: 100% !important;
-          height: auto;
-         display: block;
-      }
+            width: 100% !important;
+            height: auto;
+            display: block;
+        }
 
-
-       @media (max-width: 900px) {
+        @media (max-width: 900px) {
             .container {
                 flex-direction: column;
             }
@@ -82,32 +124,36 @@
 </head>
 <body>
     <h1>Ocorrências em Tempo Real</h1>
+
+    <!-- Filtros -->
     <form method="GET" action="/">
-    <label for="distrito">Distrito:</label>
-    <select name="distrito">
-        <option value="">Todos</option>
-        {% for d in distritos %}
-            <option value="{{ d }}" {% if d == distrito_selecionado %}selected{% endif %}>{{ d }}</option>
-        {% endfor %}
-    </select>
+        <label for="distrito">Distrito:</label>
+        <select name="distrito">
+            <option value="">Todos</option>
+            {% for d in distritos %}
+                <option value="{{ d }}" {% if d == distrito_selecionado %}selected{% endif %}>{{ d }}</option>
+            {% endfor %}
+        </select>
 
-    <label for="estado">Estado:</label>
-    <select name="estado">
-        <option value="">Todos</option>
-        {% for e in estados %}
-            <option value="{{ e }}" {% if e == estado_selecionado %}selected{% endif %}>{{ e }}</option>
-        {% endfor %}
-    </select>
+        <label for="estado">Estado:</label>
+        <select name="estado">
+            <option value="">Todos</option>
+            {% for e in estados %}
+                <option value="{{ e }}" {% if e == estado_selecionado %}selected{% endif %}>{{ e }}</option>
+            {% endfor %}
+        </select>
 
-    <button type="submit">Filtrar</button>
-</form>
+        <button type="submit">Filtrar</button>
+    </form>
+
+    <!-- Conteúdo principal -->
     <div class="container">
         <!-- Mapa Interativo -->
         <div class="mapa">
             {{ mapa|safe }}
         </div>
 
-        <!-- Vários Gráficos -->
+        <!-- Gráficos -->
         <div class="grafico-container">
             {{ grafico|safe }}
             {% if grafico2 %}
