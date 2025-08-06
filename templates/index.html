@@ -2,206 +2,89 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard de Ocorrências</title>
+    <title>Lista de Ocorrências</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    <!-- DataTables CSS & JS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+    <!-- DataTables Configuração -->
     <script>
-        window.addEventListener('resize', () => {
-            try {
-                const plots = document.querySelectorAll('.plotly-graph-div');
-                plots.forEach(p => {
-                    if (window.Plotly && Plotly.Plots && Plotly.Plots.resize) {
-                        Plotly.Plots.resize(p);
-                    }
-                });
-            } catch (e) {
-                console.warn("Erro ao redimensionar gráfico:", e);
-            }
+        $(document).ready(function () {
+            $('#tabela-ocorrencias').DataTable({
+                pageLength: 10,
+                order: [[0, 'desc']],
+                language: {
+                    url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/pt-PT.json"
+                }
+            });
         });
     </script>
 
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f7f7f7;
+            margin: 40px;
+            background-color: #f9f9f9;
         }
 
-        h1 {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .stats-cards {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .card {
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-            min-width: 150px;
-            text-align: center;
-            flex: 1;
-        }
-
-        .card h3 {
-            margin-bottom: 10px;
-            font-size: 16px;
+        h2 {
             color: #333;
         }
 
-        .card p {
-            font-size: 22px;
-            font-weight: bold;
-            color: #007BFF;
+        table.dataTable thead th {
+            background-color: #eaeaea;
+            color: #333;
         }
 
-        form {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 30px;
+        .dataTables_wrapper .dataTables_filter {
+            float: right;
+            text-align: right;
         }
 
-        label {
-            font-weight: bold;
-        }
-
-        select {
-            padding: 6px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-
-        button {
-            padding: 8px 16px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #0056b3;
-        }
-
-        .container {
-            display: flex;
-            gap: 30px;
-            flex-wrap: wrap;
-        }
-
-        .mapa {
-            flex: 1;
-            max-width: 100%;
-            min-height: 750px;
-            background-color: #fff;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 0 8px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-
-        .grafico-container {
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-            flex: 1;
-            min-width: 300px;
-        }
-
-        iframe {
-            width: 100%;
-            border: none;
-        }
-
-        .grafico-container iframe {
-            height: 400px;
-        }
-
-        @media (max-width: 900px) {
-            .container {
-                flex-direction: column;
-            }
-
-            .mapa, .grafico-container {
-                max-width: 100%;
-            }
+        .dataTables_wrapper .dataTables_paginate {
+            float: right;
+            text-align: right;
         }
     </style>
 </head>
 <body>
-    <h1>Ocorrências em Tempo Real</h1>
 
-    <!-- Cartões estatísticos -->
-    <div class="stats-cards">
-        <div class="card">
-            <h3>Total Ocorrências</h3>
-            <p>{{ total_ocorrencias }}</p>
+    {% if ocorrencias and ocorrencias|length > 0 %}
+        <h2>📋 Lista de Ocorrências</h2>
+        <div style="overflow-x: auto;">
+            <table id="tabela-ocorrencias" class="display" style="width:100%; font-size: 13px;">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Natureza</th>
+                        <th>Distrito</th>
+                        <th>Concelho</th>
+                        <th>Estado</th>
+                        <th>Meios</th>
+                        <th>Operacionais</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for o in ocorrencias %}
+                        <tr>
+                            <td>{{ o.dataocorrencia.strftime('%d-%m-%Y %H:%M') if o.dataocorrencia }}</td>
+                            <td>{{ o.natureza }}</td>
+                            <td>{{ o.distrito }}</td>
+                            <td>{{ o.concelho }}</td>
+                            <td>{{ o.estadoocorrencia }}</td>
+                            <td>{{ o.totalmeios }}</td>
+                            <td>{{ o.totaloperacionais }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-        <div class="card">
-            <h3>Total Operacionais</h3>
-            <p>{{ total_operacionais }}</p>
-        </div>
-        <div class="card">
-            <h3>Total Veículos</h3>
-            <p>{{ total_veiculos }}</p>
-        </div>
-        <div class="card">
-            <h3>Total Aéreos</h3>
-            <p>{{ total_aereos }}</p>
-        </div>
-        <div class="card">
-            <h3>Total Aquáticos</h3>
-            <p>{{ total_aquaticos }}</p>
-        </div>
-        <div class="card">
-            <h3>Total Incêndios</h3>
-            <p>{{ total_incendios }}</p>
-        </div>
-    </div>
+    {% else %}
+        <p>Não há ocorrências disponíveis.</p>
+    {% endif %}
 
-    <!-- Filtros -->
-    <form method="GET" action="/">
-        <label for="distrito">Distrito:</label>
-        <select name="distrito">
-            <option value="">Todos</option>
-            {% for d in distritos %}
-                <option value="{{ d }}" {% if d == distrito_selecionado %}selected{% endif %}>{{ d }}</option>
-            {% endfor %}
-        </select>
-
-        <label for="estado">Estado:</label>
-        <select name="estado">
-            <option value="">Todos</option>
-            {% for e in estados %}
-                <option value="{{ e }}" {% if e == estado_selecionado %}selected{% endif %}>{{ e }}</option>
-            {% endfor %}
-        </select>
-
-        <button type="submit">Filtrar</button>
-    </form>
-
-    <!-- Conteúdo principal -->
-    <div class="container">
-        <div class="mapa">
-            {{ mapa|safe }}
-        </div>
-
-        <div class="grafico-container">
-            {{ grafico|safe }}
-            {% if grafico2 %}
-                {{ grafico2|safe }}
-            {% endif %}
-        </div>
-    </div>
 </body>
 </html>
