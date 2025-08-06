@@ -81,8 +81,24 @@ def index():
     grafico = px.bar(df_filtrado, x="dataocorrencia", y="totalmeios", color="distrito", title="Meios Envolvidos por Ocorrência")
     grafico_html = grafico.to_html(full_html=False)
 
-    grafico2 = px.bar(df_filtrado, x="distrito", y="totalmeios", title="Total de Meios por Distrito")
-    grafico2_html = grafico2.to_html(full_html=False)
+    # Agrupar os dados por distrito e somar os meios
+df_barras = df_filtrado.groupby("distrito", as_index=False)["totalmeios"].sum()
+
+# Eliminar distritos com totalmeios = 0
+df_barras = df_barras[df_barras["totalmeios"] > 0]
+
+# Criar o gráfico com rótulos nas barras
+grafico2 = px.bar(
+    df_barras,
+    x="distrito",
+    y="totalmeios",
+    title="Total de Meios por Distrito",
+    text="totalmeios"
+)
+grafico2.update_traces(textposition="outside")
+
+# Exportar para HTML
+grafico2_html = grafico2.to_html(full_html=False)
 
     mapa = px.scatter_mapbox(
         df_filtrado,
