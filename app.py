@@ -59,32 +59,49 @@ def obter_dados_prociv():
         return pd.DataFrame()        
 # Rota principal
 @app.route("/", methods=["GET", "POST"])
+@app.route("/", methods=["GET", "POST"])
 def index():
     df = obter_dados_prociv()
 
-    # Aplica filtros (ex: por distrito e estado)
-    distrito = request.form.get("distrito", "Todos")
-    estado = request.form.get("estado", "Todos")
+    # Verificar se o DataFrame tem dados
+    if df.empty:
+        distritos = []
+        estados = []
+        df_filtrado = pd.DataFrame()
+    else:
+        # Filtros do formulário
+        distrito = request.form.get("distrito", "Todos")
+        estado = request.form.get("estado", "Todos")
 
-    df_filtrado = df.copy()
-    if distrito != "Todos" and "distrito" in df.columns:
-        df_filtrado = df_filtrado[df_filtrado["distrito"] == distrito]
-    if estado != "Todos" and "estado" in df.columns:
-        df_filtrado = df_filtrado[df_filtrado["estado"] == estado]
+        # Filtro defensivo
+        df_filtrado = df.copy()
+        if distrito != "Todos" and "distrito" in df.columns:
+            df_filtrado = df_filtrado[df_filtrado["distrito"] == distrito]
+        if estado != "Todos" and "estadoocorrencia" in df.columns:
+            df_filtrado = df_filtrado[df_filtrado["estadoocorrencia"] == estado]
 
-    # ⬇️ Cola aqui o bloco defensivo
+        # Listas para dropdowns
+        distritos = sorted(df["distrito"].dropna().unique()) if "distrito" in df.columns else []
+        estados = sorted(df["estadoocorrencia"].dropna().unique()) if "estadoocorrencia" in df.columns else []
+
+    # Funções defensivas
     def get_safe_sum(df, col):
         return int(df[col].sum()) if col in df.columns else 0
 
     def get_safe_count(df, col, value):
         return df[df[col] == value].shape[0] if col in df.columns else 0
 
+    # Métricas
     total_ocorrencias = len(df_filtrado)
-    total_operacionais = get_safe_sum(df_filtrado, "totaloperacionais")
-    total_veiculos = get_safe_sum(df_filtrado, "totalmeios")
-    total_aereos = get_safe_sum(df_filtrado, "meiosaereos")
-    total_meios_aquaticos = get_safe_sum(df_filtrado, "meiosaquaticos")
-    total_incendios = get_safe_count(df_filtrado, "tipoocorrencia", "incendio")
+    total_operacionais = get_safe_sum(df_filtrado, "operacionais")
+    total_veiculos = (
+        get_safe_sum(df_filtrado, "numeromeiosterrestresenvolvidos") +
+        get_safe_sum(df_filtrado, "numeromeiosaereosenvolvidos") +
+        get_safe_sum(df_filtrado, "numeromeiosaquaticos")
+    )
+    total_aereos = get_safe_sum(df_filtrado, "numeromeiosaereosenvolvidos")
+    total_meios_aquaticos = get_safe_sum(df_filtrado, "numeromeiosaquaticos")
+    total_incendios = get_safe_count(df_filtrado, "natureza", "incendio")
 
     # 📍 Dropdowns
     distritos = sorted(df["distrito"].dropna().unique())
