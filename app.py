@@ -34,14 +34,17 @@ def index():
     # 🧹 Limpeza e tratamento
     df["dataocorrencia"] = pd.to_datetime(df["DataInicioOcorrencia"], errors="coerce")
     df["natureza"] = df["Natureza"]
-    df["csrepc"] = df["Sub-Região"]
+    df["csrepc"] = df["CSREPC"]  # Substitui Distrito por Sub Região
     df["concelho"] = df["Concelho"]
     df["estadoocorrencia"] = df["EstadoOcorrencia"]
     df["totalmeios"] = pd.to_numeric(df["NumeroMeiosTerrestresEnvolvidos"], errors="coerce").fillna(0).astype(int)
     df["totaloperacionais"] = pd.to_numeric(df["Operacionais"], errors="coerce").fillna(0).astype(int)
 
+    # 🏷️ Renomear para exibição
+    df.rename(columns={"csrepc": "Sub Região"}, inplace=True)
+
     # 📊 Dados para gráfico
-    grafico_df = df.groupby("csrepc").size().sort_values(ascending=False)
+    grafico_df = df.groupby("Sub Região").size().sort_values(ascending=False)
     grafico_labels = grafico_df.index.tolist()
     grafico_dados = grafico_df.values.tolist()
 
@@ -51,7 +54,11 @@ def index():
     total_meios = df["totalmeios"].sum()
 
     # 🧾 Dados para tabela
-    df_filtrado = df[["dataocorrencia", "natureza", "csrepc", "concelho", "estadoocorrencia", "totalmeios", "totaloperacionais"]].fillna("Desconhecido")
+    df_filtrado = df[[
+        "dataocorrencia", "natureza", "Sub Região", "concelho",
+        "estadoocorrencia", "totalmeios", "totaloperacionais"
+    ]].fillna("Desconhecido")
+
     geojson_data = geojson  # já está em formato dict
 
     return render_template(
