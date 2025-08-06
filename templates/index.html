@@ -116,22 +116,22 @@
     <script>
         const ctx = document.getElementById('graficoOcorrencias').getContext('2d');
         const grafico = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: {{ grafico_labels | safe }},
-                datasets: [{
-                    label: 'Ocorrências por Distrito',
-                    data: {{ grafico_dados | safe }},
-                    backgroundColor: 'rgba(255, 99, 132, 0.5)'
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: { beginAtZero: true }
-                }
-            }
-        });
+    type: 'bar',
+    data: {
+        labels: {{ grafico_labels | tojson }},
+        datasets: [{
+            label: 'Ocorrências por Distrito',
+            data: {{ grafico_dados | tojson }},
+            backgroundColor: 'rgba(255, 99, 132, 0.5)'
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: { beginAtZero: true }
+        }
+    }
+    });
     </script>
 
     <!-- Tabela -->
