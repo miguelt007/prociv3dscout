@@ -44,6 +44,15 @@
     th {
       background-color: #eee;
     }
+    .filtros {
+      margin: 30px 0;
+    }
+    .filtros label {
+      margin-right: 10px;
+    }
+    .filtros select {
+      margin-right: 20px;
+    }
   </style>
 </head>
 <body>
@@ -68,6 +77,27 @@
   <!-- 🗺️ Mapa -->
   <div id="map"></div>
 
+  <!-- 🔍 Filtros -->
+  <div class="filtros">
+    <label for="filtroDistrito">Distrito:</label>
+    <select id="filtroDistrito">
+      <option value="">Todos</option>
+      {% for d in grafico_labels %}
+      <option value="{{ d }}">{{ d }}</option>
+      {% endfor %}
+    </select>
+
+    <label for="filtroNatureza">Natureza:</label>
+    <select id="filtroNatureza">
+      <option value="">Todas</option>
+      {% for o in ocorrencias %}
+        {% if o.natureza %}
+          <option value="{{ o.natureza }}">{{ o.natureza }}</option>
+        {% endif %}
+      {% endfor %}
+    </select>
+  </div>
+
   <!-- 📊 Gráfico -->
   <canvas id="graficoDistritos"></canvas>
 
@@ -85,19 +115,7 @@
         <th>Operacionais</th>
       </tr>
     </thead>
-    <tbody>
-      {% for o in ocorrencias %}
-      <tr>
-        <td>{{ o.dataocorrencia }}</td>
-        <td>{{ o.natureza }}</td>
-        <td>{{ o.distrito }}</td>
-        <td>{{ o.concelho }}</td>
-        <td>{{ o.estadoocorrencia }}</td>
-        <td>{{ o.totalmeios }}</td>
-        <td>{{ o.totaloperacionais }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
+    <tbody id="tabelaOcorrencias"></tbody>
   </table>
 
   <!-- Scripts -->
@@ -105,18 +123,19 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <script>
-    // 📊 Dados do gráfico
-    const graficoLabels = {{ grafico_labels | tojson }};
-    const graficoDados = {{ grafico_dados | tojson }};
+    // 📊 Dados do gráfico e tabela
+    const todasOcorrencias = {{ ocorrencias | tojson }};
+    const tabelaBody = document.getElementById("tabelaOcorrencias");
 
+    // Inicializar gráfico
     const ctx = document.getElementById('graficoDistritos').getContext('2d');
-    new Chart(ctx, {
+    let grafico = new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: graficoLabels,
+        labels: [],
         datasets: [{
           label: 'Ocorrências por distrito',
-          data: graficoDados,
+          data: [],
           backgroundColor: 'rgba(54, 162, 235, 0.6)'
         }]
       },
@@ -128,15 +147,66 @@
       }
     });
 
+    function renderTabela(filtradas) {
+      tabelaBody.innerHTML = "";
+      filtradas.forEach(o => {
+        tabelaBody.innerHTML += `
+          <tr>
+            <td>${o.dataocorrencia}</td>
+            <td>${o.natureza}</td>
+            <td>${o.distrito}</td>
+            <td>${o.concelho}</td>
+            <td>${o.estadoocorrencia}</td>
+            <td>${o.totalmeios}</td>
+            <td>${o.totaloperacionais}</td>
+          </tr>
+        `;
+      });
+    }
+
+    function atualizarGrafico(filtradas) {
+      const contagem = {};
+      filtradas.forEach(o => {
+        if (o.distrito) {
+          contagem[o.distrito] = (contagem[o.distrito] || 0) + 1;
+        }
+      });
+
+      const labels = Object.keys(contagem);
+      const dados = Object.values(contagem);
+
+      grafico.data.labels = labels;
+      grafico.data.datasets[0].data = dados;
+      grafico.update();
+    }
+
+    function aplicarFiltros() {
+      const distrito = document.getElementById("filtroDistrito").value;
+      const natureza = document.getElementById("filtroNatureza").value;
+
+      const filtradas = todasOcorrencias.filter(o => {
+        return (!distrito || o.distrito === distrito) &&
+               (!natureza || o.natureza === natureza);
+      });
+
+      renderTabela(filtradas);
+      atualizarGrafico(filtradas);
+    }
+
+    document.getElementById("filtroDistrito").addEventListener("change", aplicarFiltros);
+    document.getElementById("filtroNatureza").addEventListener("change", aplicarFiltros);
+
+    // Render inicial
+    renderTabela(todasOcorrencias);
+    atualizarGrafico(todasOcorrencias);
+
     // 🗺️ Mapa
     const map = L.map('map').setView([39.5, -8], 7);
-
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors'
     }).addTo(map);
 
     const ocorrenciasGeo = {{ geojson_data | tojson }};
-
     L.geoJSON(ocorrenciasGeo, {
       onEachFeature: function (feature, layer) {
         const props = feature.properties || {};
