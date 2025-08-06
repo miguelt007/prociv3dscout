@@ -92,7 +92,7 @@ def index():
         hover_data=["estadoocorrencia", "distrito", "concelho"],
         color="estado",
         zoom=6,
-        height=900
+        height="100%"
     )
     mapa.update_layout(mapbox_style="open-street-map")
     mapa_html = mapa.to_html(full_html=False)
