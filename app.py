@@ -65,7 +65,6 @@ def index():
     distrito = request.args.get("distrito")
     estado = request.args.get("estado")
 
-    # Aplica os filtros
     df = obter_dados()
     df_filtrado = df.copy()
     if distrito:
@@ -73,45 +72,37 @@ def index():
     if estado:
         df_filtrado = df_filtrado[df_filtrado["estadoocorrencia"] == estado]
 
-    # Lista única para preencher o dropdown
     distritos = sorted(df["distrito"].unique())
     estados = sorted(df["estadoocorrencia"].unique())
 
-    # Recriar gráficos com df_filtrado
     grafico = px.bar(df_filtrado, x="dataocorrencia", y="totalmeios", color="distrito", title="Meios Envolvidos por Ocorrência")
     grafico_html = grafico.to_html(full_html=False)
 
-    # Agrupar os dados por distrito e somar os meios
-df_barras = df_filtrado.groupby("distrito", as_index=False)["totalmeios"].sum()
+    df_barras = df_filtrado.groupby("distrito", as_index=False)["totalmeios"].sum()
+    df_barras = df_barras[df_barras["totalmeios"] > 0]
 
-# Eliminar distritos com totalmeios = 0
-df_barras = df_barras[df_barras["totalmeios"] > 0]
+    grafico2 = px.bar(
+        df_barras,
+        x="distrito",
+        y="totalmeios",
+        title="Total de Meios por Distrito",
+        text="totalmeios"
+    )
+    grafico2.update_traces(textposition="outside")
+    grafico2_html = grafico2.to_html(full_html=False)
 
-# Criar o gráfico com rótulos nas barras
-grafico2 = px.bar(
-    df_barras,
-    x="distrito",
-    y="totalmeios",
-    title="Total de Meios por Distrito",
-    text="totalmeios"
-)
-grafico2.update_traces(textposition="outside")
-
-# Exportar para HTML
-grafico2_html = grafico2.to_html(full_html=False)
-
-mapa = px.scatter_mapbox(
-    df_filtrado,
-    lat="latitude",
-    lon="longitude",
-    hover_name="natureza",
-    hover_data=["estadoocorrencia", "distrito", "concelho"],
-    color="estado",
-    zoom=6,
-    height=750
-)
-mapa.update_layout(mapbox_style="open-street-map")
-mapa_html = mapa.to_html(full_html=False)
+    mapa = px.scatter_mapbox(
+        df_filtrado,
+        lat="latitude",
+        lon="longitude",
+        hover_name="natureza",
+        hover_data=["estadoocorrencia", "distrito", "concelho"],
+        color="estado",
+        zoom=6,
+        height=750
+    )
+    mapa.update_layout(mapbox_style="open-street-map")
+    mapa_html = mapa.to_html(full_html=False)
 
     return render_template(
         "index.html",
@@ -123,7 +114,6 @@ mapa_html = mapa.to_html(full_html=False)
         distrito_selecionado=distrito,
         estado_selecionado=estado
     )
-
 # Executar a aplicação
 if __name__ == "__main__":
     app.run(debug=True)
