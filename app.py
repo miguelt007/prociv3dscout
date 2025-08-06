@@ -88,21 +88,36 @@ def index():
         title="Total de Meios por Distrito",
         text="totalmeios"
     )
-    grafico2.update_traces(textposition="outside")
-    grafico2_html = grafico2.to_html(full_html=False)
+   # Ajustar a posição dos textos nas barras
+grafico2.update_traces(textposition="outside")
 
-    mapa = px.scatter_mapbox(
-        df_filtrado,
-        lat="latitude",
-        lon="longitude",
-        hover_name="natureza",
-        hover_data=["estadoocorrencia", "distrito", "concelho"],
-        color="estado",
-        zoom=6,
-        height=750
-    )
-    mapa.update_layout(mapbox_style="open-street-map")
-    mapa_html = mapa.to_html(full_html=False)
+# Obter o valor máximo dos dados para ajustar o eixo Y com margem
+valor_max = df_barras["totalmeios"].max()
+
+grafico2.update_layout(
+    yaxis=dict(range=[0, valor_max * 1.2])  # 20% de margem acima do maior valor
+)
+
+# Gerar o HTML do gráfico de barras
+grafico2_html = grafico2.to_html(full_html=False)
+
+# Criar o mapa interativo
+mapa = px.scatter_mapbox(
+    df_filtrado,
+    lat="latitude",
+    lon="longitude",
+    hover_name="natureza",
+    hover_data=["estadoocorrencia", "distrito", "concelho"],
+    color="estado",
+    zoom=6,
+    height=750
+)
+
+# Estilo do mapa OpenStreetMap
+mapa.update_layout(mapbox_style="open-street-map")
+
+# Gerar o HTML do mapa
+mapa_html = mapa.to_html(full_html=False)
 
     return render_template(
         "index.html",
