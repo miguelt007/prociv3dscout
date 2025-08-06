@@ -164,7 +164,8 @@ def index():
         total_veiculos=total_veiculos,
         total_aereos=total_aereos,
         total_meios_aquaticos=total_meios_aquaticos,
-        total_incendios=total_incendios
+        total_incendios=total_incendios,
+        ocorrencias=df_filtrado.to_dict(orient="records")
     )
 
 # 🚀 Executar a aplicação
