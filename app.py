@@ -29,7 +29,7 @@ def index():
             mapa = px.scatter_mapbox(df,
                                      lat="Latitude",
                                      lon="Longitude",
-                                     hover_name="Local",
+                                     hover_name="Localidade",
                                      zoom=6,
                                      height=500)
             mapa.update_layout(mapbox_style="open-street-map")
