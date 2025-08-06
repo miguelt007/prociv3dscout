@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard de Ocorrências</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f7f7f7;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .container {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .mapa, .grafico-container {
+            flex: 1;
+            max-width: 48%;
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 8px rgba(0,0,0,0.1);
+        }
+
+        .grafico-container {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        iframe {
+            width: 100%;
+            border: none;
+        }
+
+        .grafico-container iframe {
+            height: 400px;
+        }
+
+        .mapa iframe {
+            height: 800px !important;
+        }
+
+        @media (max-width: 900px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .mapa, .grafico-container {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Ocorrências em Tempo Real</h1>
+    <div class="container">
+        <!-- Mapa Interativo -->
+        <div class="mapa">
+            {{ mapa|safe }}
+        </div>
+
+        <!-- Vários Gráficos -->
+        <div class="grafico-container">
+            {{ grafico|safe }}
+            {% if grafico2 %}
+                {{ grafico2|safe }}
+            {% endif %}
+            {% if grafico3 %}
+                {{ grafico3|safe }}
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
