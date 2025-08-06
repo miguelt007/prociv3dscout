@@ -1,17 +1,3 @@
-from flask import Flask, render_template
-import requests
-import pandas as pd
-import plotly.express as px
-
-app = Flask(__name__)
-
-def obter_dados():
-    url = "https://3pscoutsteste.abranco.pt/api/ANEPCAPI/GetPointsGetOcorrenciasActivasLista"
-    resposta = requests.get(url)
-    if resposta.status_code == 200:
-        return resposta.json()
-    return []
-
 @app.route('/')
 def index():
     dados = obter_dados()
@@ -21,23 +7,24 @@ def index():
     mapa_html = "<p>Nenhum dado de localização disponível.</p>"
 
     if not df.empty:
-        # Gráfico de barras por tipo de ocorrência
+        # ➤ Limpar valores nulos na coluna Tipo
         if 'Tipo' in df.columns and not df['Tipo'].isna().all():
-            fig = px.histogram(df, x='Tipo', title='Tipos de Ocorrência')
+            df_tipo = df[df['Tipo'].notna()]
+            fig = px.histogram(df_tipo, x='Tipo', title='Tipos de Ocorrência')
             grafico_html = fig.to_html(full_html=False)
 
-        # Verificar e preparar coordenadas
+        # ➤ Limpar e converter coordenadas
         if {'Latitude', 'Longitude'}.issubset(df.columns):
             df["Latitude"] = pd.to_numeric(df["Latitude"].str.replace(",", ".", regex=False), errors="coerce")
             df["Longitude"] = pd.to_numeric(df["Longitude"].str.replace(",", ".", regex=False), errors="coerce")
             df.dropna(subset=["Latitude", "Longitude"], inplace=True)
 
-            # Verificar coluna para hover
+            # ➤ Confirmar colunas para hover e cor
             hover_col = "Localidade" if "Localidade" in df.columns else None
             hover_data = ["Distrito", "Concelho", "Freguesia", "Tipo", "Estado"] if hover_col else None
-            cor = "Tipo" if "Tipo" in df.columns else None
+            cor = "Tipo" if "Tipo" in df.columns and not df['Tipo'].isna().all() else None
 
-            # Criar mapa
+            # ➤ Construir o mapa
             mapa = px.scatter_mapbox(
                 df,
                 lat="Latitude",
