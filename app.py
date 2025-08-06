@@ -6,6 +6,10 @@ import requests
 # Inicializar a aplicação Flask
 app = Flask(__name__)
 
+def coluna_segura(df, coluna, default=0):
+    """Retorna uma série segura para colunas que podem não existir."""
+    return df[coluna] if coluna in df.columns else pd.Series([default] * len(df))
+
 # Função para obter e preparar os dados
 def obter_dados():
     url = "https://3pscoutsteste.abranco.pt/api/ANEPCAPI/GetPointsGetOcorrenciasActivasLista"
@@ -64,6 +68,12 @@ def index():
 
     # 📊 Carregar dados
     df = obter_dados()
+
+    # 🔍 Verificar integridade mínima
+    colunas_necessarias = {"distrito", "estadoocorrencia", "natureza", "dataocorrencia", "latitude", "longitude", "estado", "concelho", "totalmeios"}
+    if df.empty or not colunas_necessarias.issubset(df.columns):
+        return render_template("erro.html", mensagem="Dados indisponíveis ou estrutura inválida.")
+
     df_filtrado = df.copy()
 
     # 🔍 Filtrar por distrito e estado
@@ -74,11 +84,17 @@ def index():
 
     # 📌 Métricas agregadas com blindagem
     total_ocorrencias = len(df_filtrado)
-    total_operacionais = int(df_filtrado.get("numeromeiosterrestresenvolvidos", pd.Series([0])).sum())
-    total_veiculos = int(df_filtrado.get("NumeroMeiosTerrestresEnvolvidos", pd.Series([0])).sum())
-    total_aereos = int(df_filtrado.get("numeromeiosaereosenvolvidos", pd.Series([0])).sum())
-    total_meios_aquaticos = int(df_filtrado.get("NumeroMeiosAquaticosEnvolvidos", pd.Series([0])).fillna(0).sum())
-    total_incendios = int(df_filtrado.get("natureza", pd.Series([])).str.contains("incêndio", case=False, na=False).sum())
+    total_operacionais = int(coluna_segura(df_filtrado, "numeromeiosterrestresenvolvidos").sum())
+    total_veiculos = int(coluna_segura(df_filtrado, "NumeroMeiosTerrestresEnvolvidos").sum())
+    total_aereos = int(coluna_segura(df_filtrado, "numeromeiosaereosenvolvidos").sum())
+    total_meios_aquaticos = int(coluna_segura(df_filtrado, "NumeroMeiosAquaticosEnvolvidos").fillna(0).sum())
+    total_incendios = int(
+        coluna_segura(df_filtrado, "natureza")
+        .fillna("")
+        .astype(str)
+        .str.contains("incêndio", case=False)
+        .sum()
+    )
 
     # 📍 Dropdowns
     distritos = sorted(df["distrito"].dropna().unique())
