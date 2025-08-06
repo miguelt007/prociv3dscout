@@ -75,7 +75,7 @@ def index():
 
     # Lista única para preencher o dropdown
     distritos = sorted(df["distrito"].unique())
-    estados = sorted(df["EstadoOcorrencia"].unique())
+    estados = sorted(df["estadoocorrencia"].unique())
 
     # Recriar gráficos com df_filtrado
     grafico = px.bar(df_filtrado, x="DataOcorrencia", y="TotalMeios", color="Distrito", title="Meios Envolvidos por Ocorrência")
