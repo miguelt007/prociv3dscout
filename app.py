@@ -9,7 +9,7 @@ app = Flask(__name__)
 # Função para obter e preparar os dados
 def obter_dados():
     # Exemplo: API de dados fictícios ou pode ser substituído por um CSV local
-    url = "https://api.exemplo.com/dados"  # ⚠️ Substitui por uma URL real se tiveres uma API
+    url = "https://3pscoutsteste.abranco.pt/api/ANEPCAPI/GetPointsGetOcorrenciasActivasLista"  # ⚠️ Substitui por uma URL real se tiveres uma API
     try:
         response = requests.get(url)
         response.raise_for_status()
