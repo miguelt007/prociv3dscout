@@ -130,7 +130,7 @@ def index():
     mapa_html = mapa.to_html(full_html=False)
 
     # 🧾 Renderizar template
-     return render_template(
+    return render_template(
         "index.html",
         mapa=mapa_html,
         grafico=grafico_html,
