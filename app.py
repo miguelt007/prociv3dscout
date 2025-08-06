@@ -26,6 +26,8 @@ def index():
             grafico_html = fig.to_html(full_html=False)
 
         if {'Latitude', 'Longitude'}.issubset(df.columns):
+            df["Latitude"] = df["Latitude"].str.replace(",", ".", regex=False).astype(float)
+            df["Longitude"] = df["Longitude"].str.replace(",", ".", regex=False).astype(float)
             mapa = px.scatter_mapbox(df,
                                      lat="Latitude",
                                      lon="Longitude",
