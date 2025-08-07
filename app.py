@@ -59,7 +59,7 @@ def index():
     # 🧾 Dados para tabela
     df_filtrado = df[[
         "dataocorrencia", "natureza", "Sub Região", "concelho",
-        "estadoocorrencia", "totalmeios", "totaloperacionais"
+        "estadoocorrencia", "totaloperacionais", "totalmeios", "NumeroMeiosAereosEnvolvidos", "NumeroMeiosAquaticos"
     ]].fillna("Desconhecido")
 
     geojson_data = geojson  # já está em formato dict
