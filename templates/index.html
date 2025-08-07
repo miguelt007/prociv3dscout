@@ -70,6 +70,30 @@
       font-size: 1em;
       color: #666;
     }
+    .estado-despacho {
+      background-color: #FFD700; /* amarelo */
+      color: black;
+    }
+    .estado-alerta {
+      background-color: orange;
+      color: black;
+    }
+    .estado-conclusao {
+      background-color: green;
+      color: white;
+    }
+    .estado-resolucao {
+      background-color: blue;
+      color: white;
+    }
+    .estado-curso {
+      background-color: red;
+      color: white;
+    }
+    .estado-vigilancia {
+      background-color: gray;
+      color: white;
+    }
   </style>
 </head>
 <body>
@@ -179,7 +203,26 @@
         }
       }
     });
-
+  // Função para mapear o estado à classe CSS
+    function obterClasseEstado(estado) {
+      switch (estado) {
+    case "Despacho":
+      return "estado-despacho";
+    case "Despacho de 1º Alerta":
+      return "estado-alerta";
+    case "Conclusão":
+      return "estado-conclusao";
+    case "Em Resolução":
+      return "estado-resolucao";
+    case "Em Curso":
+      return "estado-curso";
+    case "Vigilância":
+      return "estado-vigilancia";
+    default:
+      return "";
+  }
+}
+     // Função que gera a tabela
     function renderTabela(filtradas) {
       tabelaBody.innerHTML = "";
       filtradas.forEach(o => {
@@ -189,7 +232,7 @@
             <td>${o.natureza}</td>
             <td>${o["Sub Região"]}</td>
             <td>${o.concelho}</td>
-            <td class="numero">${o.estadoocorrencia}</td>
+            <td class="centro ${obterClasseEstado(o.estadoocorrencia)}">${o.estadoocorrencia}</td>
             <td class="numero">${o.totaloperacionais}</td>
             <td class="numero">${o.totalmeios}</td>
             <td class="numero">${o.NumeroMeiosAereosEnvolvidos ?? 0}</td>
