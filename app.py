@@ -54,6 +54,8 @@ def index():
     total_meios = df["totalmeios"].sum()
     total_meios_aereos = pd.to_numeric(df["NumeroMeiosAereosEnvolvidos"], errors="coerce").fillna(0).astype(int).sum()
 
+    # 🎯 Filtro de estados únicos
+    estados_disponiveis = sorted(df["estadoocorrencia"].dropna().unique())
     # 🧾 Dados para tabela
     df_filtrado = df[[
         "dataocorrencia", "natureza", "Sub Região", "concelho",
@@ -72,6 +74,7 @@ def index():
         total_operacionais=total_operacionais,
         total_meios=total_meios,
         total_meios_aereos=total_meios_aereos
+        estados_disponiveis=estados_disponiveis
     )
 
 if __name__ == "__main__":
