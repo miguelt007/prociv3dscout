@@ -140,7 +140,7 @@
         <th>Sub Região</th>
         <th>Concelho</th>
         <th>Estado</th>
-        <th>Meios</th>
+        <th>Meios Terrestres</th>
         <th>Operacionais</th>
       </tr>
     </thead>
@@ -236,17 +236,20 @@
       onEachFeature: function (feature, layer) {
         const props = feature.properties || {};
         layer.bindPopup(`
-  <strong>${props.Natureza || 'Sem natureza'}</strong><br>
-  <em>${new Date(props.DataInicioOcorrencia).toLocaleString('pt-PT') || 'Sem data'}</em><br>
-  <strong>Estado:</strong> ${props.EstadoOcorrencia || 'Sem estado'}<br>
-  <strong>Sub Região:</strong> ${props.CSREPC || 'Sem sub região'}<br>
-  <strong>Concelho:</strong> ${props.Concelho || 'Sem concelho'}<br>
-  <strong>Freguesia:</strong> ${props.Freguesia || 'Sem freguesia'}<br>
-  <strong>Localidade:</strong> ${props.Localidade || 'Sem localidade'}<br>
-  <strong>Meios Terrestres:</strong> ${props.NumeroMeiosTerrestresEnvolvidos ?? 0}<br>
-  <strong>Meios Aéreos:</strong> ${props.NumeroMeiosAereosEnvolvidos ?? 0}<br>
-  <strong>Operacionais:</strong> ${props.Operacionais ?? 0}
- `);
+  <strong>🔥 ${props.Natureza || 'Sem natureza'}</strong><br>
+  🕒 <em>${new Date(props.DataInicioOcorrencia).toLocaleString('pt-PT') || 'Sem data'}</em><br><br>
+  
+  📍 <strong>Localização:</strong><br>
+  🏘️ ${props.Localidade || 'Sem localidade'}<br>
+  🏡 ${props.Freguesia || 'Sem freguesia'}<br>
+  🏙️ ${props.Concelho || 'Sem concelho'}<br>
+  🌍 ${props.CSREPC || 'Sem sub região'}<br><br>  
+  📊 <strong>Estado:</strong> ${props.EstadoOcorrencia || 'Sem estado'}<br><br>  
+  🚒 <strong>Meios Terrestres:</strong> ${props.NumeroMeiosTerrestresEnvolvidos ?? 0}<br>
+  🚁 <strong>Meios Aéreos:</strong> ${props.NumeroMeiosAereosEnvolvidos ?? 0}<br>
+  🚤 <strong>Meios Aquáticos:</strong> ${props.NumeroMeiosAquaticos ?? 0}<br>
+  👨‍🚒 <strong>Operacionais:</strong> ${props.Operacionais ?? 0}
+`);
   }
     }).addTo(map);
   </script>
