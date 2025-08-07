@@ -54,8 +54,6 @@
     .filtros select {
       margin-right: 20px;
     }
-  </style>
-  <style>
     .card img {
       display: block;
       margin: 0 auto 10px;
@@ -73,36 +71,29 @@
 <body>
   <h1>📍 Ocorrências ProCiv</h1>
 
- <!-- 🧮 Cartões resumo com ícones -->
-<div class="cards">
- <!-- 🔥 Ocorrências -->
-<div class="card">
-  <img src="https://cdn-icons-png.flaticon.com/512/482/482947.png" alt="Chamas" style="width:50px; margin-bottom:10px;">
-  <h2>{{ total_ocorrencias }}</h2>
-  <p>Total de Ocorrências</p>
-</div>
-
-<!-- 👨‍🚒 Operacionais -->
-<div class="card">
-  <img src="https://cdn-icons-png.flaticon.com/512/7242/7242607.png" alt="Bombeiro" style="width:50px; margin-bottom:10px;">
-  <h2>{{ total_operacionais }}</h2>
-  <p>Total de Operacionais</p>
-</div>
-
-<!-- 🚒 Meios Terrestres -->
-<div class="card">
-  <img src="https://cdn-icons-png.flaticon.com/512/808/808439.png" alt="Camião de Bombeiros" style="width:50px; margin-bottom:10px;">
-  <h2>{{ total_meios }}</h2>
-  <p>Total de Meios Terrestres</p>
-</div>
-
-<!-- 🚁 Meios Aéreos -->
-<div class="card">
-  <img src="https://cdn-icons-png.flaticon.com/512/3469/3469734.png" alt="Helicóptero" style="width:50px; margin-bottom:10px;">
-  <h2>{{ total_meios_aereos }}</h2>
-  <p>Total de Meios Aéreos</p>
-</div>
-</div>
+  <!-- 🧮 Cartões resumo -->
+  <div class="cards">
+    <div class="card">
+      <img src="https://cdn-icons-png.flaticon.com/512/482/482947.png" alt="Chamas" style="width:50px;">
+      <h2>{{ total_ocorrencias }}</h2>
+      <p>Total de Ocorrências</p>
+    </div>
+    <div class="card">
+      <img src="https://cdn-icons-png.flaticon.com/512/7242/7242607.png" alt="Bombeiro" style="width:50px;">
+      <h2>{{ total_operacionais }}</h2>
+      <p>Total de Operacionais</p>
+    </div>
+    <div class="card">
+      <img src="https://cdn-icons-png.flaticon.com/512/808/808439.png" alt="Camião de Bombeiros" style="width:50px;">
+      <h2>{{ total_meios }}</h2>
+      <p>Total de Meios Terrestres</p>
+    </div>
+    <div class="card">
+      <img src="https://cdn-icons-png.flaticon.com/512/3469/3469734.png" alt="Helicóptero" style="width:50px;">
+      <h2>{{ total_meios_aereos }}</h2>
+      <p>Total de Meios Aéreos</p>
+    </div>
+  </div>
 
   <!-- 🗺️ Mapa -->
   <div id="map"></div>
@@ -123,6 +114,15 @@
       {% set naturezas_unicas = ocorrencias | map(attribute='natureza') | select | unique | list | sort %}
       {% for n in naturezas_unicas %}
       <option value="{{ n }}">{{ n }}</option>
+      {% endfor %}
+    </select>
+
+    <label for="filtroEstado">Estado:</label>
+    <select id="filtroEstado">
+      <option value="">Todos</option>
+      {% set estados_unicos = ocorrencias | map(attribute='estadoocorrencia') | select | unique | list | sort %}
+      {% for estado in estados_unicos %}
+      <option value="{{ estado }}">{{ estado }}</option>
       {% endfor %}
     </select>
   </div>
@@ -152,11 +152,9 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <script>
-    // 📊 Dados do gráfico e tabela
     const todasOcorrencias = {{ ocorrencias | tojson }};
     const tabelaBody = document.getElementById("tabelaOcorrencias");
 
-    // Inicializar gráfico
     const ctx = document.getElementById('graficoSubRegioes').getContext('2d');
     let grafico = new Chart(ctx, {
       type: 'bar',
@@ -201,21 +199,20 @@
         }
       });
 
-      const labels = Object.keys(contagem);
-      const dados = Object.values(contagem);
-
-      grafico.data.labels = labels;
-      grafico.data.datasets[0].data = dados;
+      grafico.data.labels = Object.keys(contagem);
+      grafico.data.datasets[0].data = Object.values(contagem);
       grafico.update();
     }
 
     function aplicarFiltros() {
       const subregiao = document.getElementById("filtroSubRegiao").value;
       const natureza = document.getElementById("filtroNatureza").value;
+      const estado = document.getElementById("filtroEstado").value;
 
       const filtradas = todasOcorrencias.filter(o => {
         return (!subregiao || o["Sub Região"] === subregiao) &&
-               (!natureza || o.natureza === natureza);
+               (!natureza || o.natureza === natureza) &&
+               (!estado || o.estadoocorrencia === estado);
       });
 
       renderTabela(filtradas);
@@ -224,12 +221,11 @@
 
     document.getElementById("filtroSubRegiao").addEventListener("change", aplicarFiltros);
     document.getElementById("filtroNatureza").addEventListener("change", aplicarFiltros);
+    document.getElementById("filtroEstado").addEventListener("change", aplicarFiltros);
 
-    // Render inicial
     renderTabela(todasOcorrencias);
     atualizarGrafico(todasOcorrencias);
 
-    // 🗺️ Mapa
     const map = L.map('map').setView([39.5, -8], 7);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors'
@@ -240,7 +236,7 @@
       onEachFeature: function (feature, layer) {
         const props = feature.properties || {};
         layer.bindPopup(`
-          <strong>${props.Natureza || 'Sem natureza'}</strong><br>
+        <strong>${props.Natureza || 'Sem natureza'}</strong><br>
           ${props.Concelho || 'Sem concelho'}, ${props.CSREPC || 'Sem sub região'}
         `);
       }
