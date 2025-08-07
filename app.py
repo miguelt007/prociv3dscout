@@ -73,7 +73,7 @@ def index():
         total_ocorrencias=total_ocorrencias,
         total_operacionais=total_operacionais,
         total_meios=total_meios,
-        total_meios_aereos=total_meios_aereos
+        total_meios_aereos=total_meios_aereos,
         estados_disponiveis=estados_disponiveis
     )
 
