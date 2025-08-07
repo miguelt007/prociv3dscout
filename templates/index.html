@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>Prociv3DScout</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -58,25 +59,29 @@
 <body>
   <h1>📍 Ocorrências ProCiv</h1>
 
-  <!-- 🧮 Cartões resumo -->
-  <div class="cards">
-    <div class="card">
-      <h2>{{ total_ocorrencias }}</h2>
-      <p>Total de Ocorrências</p>
-    </div>
-    <div class="card">
-      <h2>{{ total_operacionais }}</h2>
-      <p>Total de Operacionais</p>
-    </div>
-    <div class="card">
-      <h2>{{ total_meios }}</h2>
-      <pTotal de Meios Terrestres</p>
-    </div>
-    <div class="card">
-      <h2>{{ total_meios }}</h2>
-      <p>Total de Meios Aéreos</p>
-    </div>
+ <!-- 🧮 Cartões resumo com ícones -->
+<div class="cards">
+  <div class="card">
+    <i class="fas fa-fire-extinguisher fa-2x" style="color: #d9534f;"></i>
+    <h2>{{ total_ocorrencias }}</h2>
+    <p>Total de Ocorrências</p>
   </div>
+  <div class="card">
+    <img src="https://cdn-icons-png.flaticon.com/512/7242/7242607.png" alt="Bombeiro" style="width:50px; margin-bottom:10px;">
+    <h2>{{ total_operacionais }}</h2>
+    <p>Total de Operacionais</p>
+  </div>
+  <div class="card">
+    <i class="fas fa-truck fa-2x" style="color: #5cb85c;"></i>
+    <h2>{{ total_meios }}</h2>
+    <p>Total de Meios Terrestres</p>
+  </div>
+  <div class="card">
+    <i class="fas fa-helicopter fa-2x" style="color: #f0ad4e;"></i>
+    <h2>{{ total_meios_aereos }}</h2>
+    <p>Total de Meios Aéreos</p>
+  </div>
+</div>
 
   <!-- 🗺️ Mapa -->
   <div id="map"></div>
