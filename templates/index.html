@@ -140,8 +140,10 @@
         <th>Sub Região</th>
         <th>Concelho</th>
         <th>Estado</th>
-        <th>Meios Terrestres</th>
         <th>Operacionais</th>
+        <th>Meios Terrestres</th>
+        <th>Meios Aéreos</th>
+        <th>Meios Aquáticos</th>        
       </tr>
     </thead>
     <tbody id="tabelaOcorrencias"></tbody>
@@ -184,8 +186,10 @@
             <td>${o["Sub Região"]}</td>
             <td>${o.concelho}</td>
             <td>${o.estadoocorrencia}</td>
-            <td>${o.totalmeios}</td>
             <td>${o.totaloperacionais}</td>
+            <td>${o.totalmeios}</td>
+            <td>${o.NumeroMeiosAereosEnvolvidos ?? 0}</td>
+            <td>${o.NumeroMeiosAquaticos ?? 0}</td>
           </tr>
         `;
       });
