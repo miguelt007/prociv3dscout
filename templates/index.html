@@ -62,6 +62,10 @@
       font-size: 2em;
       margin: 0;
     }
+    td.numero {
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
     .card p {
       font-size: 1em;
       color: #666;
@@ -181,15 +185,15 @@
       filtradas.forEach(o => {
         tabelaBody.innerHTML += `
           <tr>
-            <td>${o.dataocorrencia}</td>
-            <td>${o.natureza}</td>
-            <td>${o["Sub Região"]}</td>
-            <td>${o.concelho}</td>
-            <td>${o.estadoocorrencia}</td>
-            <td>${o.totaloperacionais}</td>
-            <td>${o.totalmeios}</td>
-            <td>${o.NumeroMeiosAereosEnvolvidos ?? 0}</td>
-            <td>${o.NumeroMeiosAquaticos ?? 0}</td>
+            <td class="numero">${o.dataocorrencia}</td>
+            <td class="numero">${o.natureza}</td>
+            <td class="numero">${o["Sub Região"]}</td>
+            <td class="numero">${o.concelho}</td>
+            <td class="numero">${o.estadoocorrencia}</td>
+            <td class="numero">${o.totaloperacionais}</td>
+            <td class="numero">${o.totalmeios}</td>
+            <td class="numero">${o.NumeroMeiosAereosEnvolvidos ?? 0}</td>
+            <td class="numero">${o.NumeroMeiosAquaticos ?? 0}</td>
           </tr>
         `;
       });
