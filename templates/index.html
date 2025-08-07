@@ -224,6 +224,8 @@
 }
      // Função que gera a tabela
     function renderTabela(filtradas) {
+      // Ordenar por data decrescente
+      filtradas.sort((a, b) => new Date(b.dataocorrencia) - new Date(a.dataocorrencia));
       tabelaBody.innerHTML = "";
       filtradas.forEach(o => {
         tabelaBody.innerHTML += `
