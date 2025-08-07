@@ -70,7 +70,7 @@ def index():
         ocorrencias=df_filtrado.to_dict(orient="records"),
         total_ocorrencias=total_ocorrencias,
         total_operacionais=total_operacionais,
-        total_meios=total_meios
+        total_meios=total_meios,
         total_meios_aereos=total_meios_aereos
     )
 
