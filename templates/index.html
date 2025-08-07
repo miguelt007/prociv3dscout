@@ -236,10 +236,15 @@
       onEachFeature: function (feature, layer) {
         const props = feature.properties || {};
         layer.bindPopup(`
-        <strong>${props.Natureza || 'Sem natureza'}</strong><br>
-          ${props.Concelho || 'Sem concelho'}, ${props.CSREPC || 'Sem sub região'}
-        `);
-      }
+  <strong>${props.Natureza || 'Sem natureza'}</strong><br>
+  <em>${props.Data || 'Sem data'}</em><br>
+  <strong>Concelho:</strong> ${props.Concelho || 'Sem concelho'}<br>
+  <strong>Sub Região:</strong> ${props.CSREPC || 'Sem sub região'}<br>
+  <strong>Estado:</strong> ${props.Estado || 'Sem estado'}<br>
+  <strong>Meios:</strong> ${props.Meios || 0}<br>
+  <strong>Operacionais:</strong> ${props.Operacionais || 0}
+  `);
+  }
     }).addTo(map);
   </script>
 </body>
